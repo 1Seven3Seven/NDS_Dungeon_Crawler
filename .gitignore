@@ -2,3 +2,4 @@ build/
 *.DS_STORE
 NDS_Dungeon_Crawler.elf
 NDS_Dungeon_Crawler.nds
+.vscode/*
