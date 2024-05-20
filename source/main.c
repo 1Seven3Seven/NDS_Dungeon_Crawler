@@ -18,11 +18,11 @@ void packet_handler(int packetID, int packetlength)
 {
     char data[1024];
 
-    Wifi_RxRawReadPacket(packetID, packetlength, (unsigned short*)data);
+    int data_read = Wifi_RxRawReadPacket(packetID, packetlength, (u16*)data);
 
-    int data_len = strlen(data);
+    int string_len = strlen(data);
 
-    if (!data_len)
+    if (!string_len)
     {
         return;
     }
@@ -31,8 +31,9 @@ void packet_handler(int packetID, int packetlength)
     {
         return;
     }
-
-    snprintf(UIDisplayBuffer[17], UI_NUM_CHARS + 1, "chars read: %d\n", data_len);
+    snprintf(UIDisplayBuffer[15], UI_NUM_CHARS + 1, "packet length: %d\n", packetlength);
+    snprintf(UIDisplayBuffer[16], UI_NUM_CHARS + 1, "data read: %d\n", data_read);
+    snprintf(UIDisplayBuffer[17], UI_NUM_CHARS + 1, "string length: %d\n", string_len);
 
     UIDisplayBuffer[19 + line_to_write_to][0] = ' ';
     line_to_write_to++;
@@ -103,12 +104,18 @@ skip_rest_wifi_stuff:  // Take a guess
         if (keys_down & KEY_A && wifi_works)
         {
             char data[1024];
-            int chars_printed = snprintf(data, 1024, "Hello, World number %d", num_sent);
-            num_sent++;
-            data[chars_printed] = '\0';
-            Wifi_RawTxFrame(chars_printed, 0x0014, (unsigned short*)data);
-            snprintf(UIDisplayBuffer[8], UI_NUM_CHARS + 1, "chars sent %d\n", chars_printed);
+            for (int i = 0; i < 1024; i++)
+            {
+                data[i] = '\0';
+            }
+            snprintf(data, 1024, "Hello, World number %d", num_sent);
+            int data_length = strlen(data) + 1;
+
+            Wifi_RawTxFrame(data_length, 0x0014, (u16*)data);
+
+            snprintf(UIDisplayBuffer[8], UI_NUM_CHARS + 1, "chars sent %d\n", data_length);
             snprintf(UIDisplayBuffer[10], UI_NUM_CHARS + 1, "%s\n", data);
+            num_sent++;
         }
 
         for (int i = 0; i < UI_NUM_LINES; i++)
