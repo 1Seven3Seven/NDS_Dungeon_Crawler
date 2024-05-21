@@ -7,38 +7,40 @@
 #include <stdio.h>
 #include <string.h>
 
-//
-#define UI_NUM_CHARS 32  // The width of the ui in characters - non-inclusive of '\0'
-#define UI_NUM_LINES 24  // The height of the ui in lines
-char UIDisplayBuffer[UI_NUM_LINES][UI_NUM_CHARS + 1];
+typedef struct _Packet
+{
+    int packetID;
+    int packetLength;
+    char data[1024];
+} Packet;
 
-int line_to_write_to = 3;
+Packet CreatePacket(int packetID, int packetLength, const char *data, int n)
+{
+    Packet packet;
+
+    packet.packetID = packetID;
+    packet.packetLength = packetLength;
+    strncpy(packet.data, data, n < 1024 ? n : 1024);
+    packet.data[1023] = '\0';
+
+    return packet;
+}
+
+Packet buncha_packets[2048];
+int num_used = 0;
 
 void packet_handler(int packetID, int packetlength)
 {
+    if (num_used >= 1024)
+    {
+        return;
+    }
+
     char data[1024];
 
-    int data_read = Wifi_RxRawReadPacket(packetID, packetlength, (u16*)data);
+    int data_read = Wifi_RxRawReadPacket(packetID, packetlength, (u16 *)data);
 
-    int string_len = strlen(data);
-
-    if (!string_len)
-    {
-        return;
-    }
-
-    if (data[0] == 128)
-    {
-        return;
-    }
-    snprintf(UIDisplayBuffer[15], UI_NUM_CHARS + 1, "packet length: %d\n", packetlength);
-    snprintf(UIDisplayBuffer[16], UI_NUM_CHARS + 1, "data read: %d\n", data_read);
-    snprintf(UIDisplayBuffer[17], UI_NUM_CHARS + 1, "string length: %d\n", string_len);
-
-    UIDisplayBuffer[19 + line_to_write_to][0] = ' ';
-    line_to_write_to++;
-    line_to_write_to %= 4;
-    snprintf(UIDisplayBuffer[19 + (line_to_write_to)], UI_NUM_CHARS + 1, "> %s\n", data);
+    buncha_packets[num_used++] = CreatePacket(packetID, packetlength, data, data_read);
 }
 
 int main(void)
@@ -51,15 +53,6 @@ int main(void)
     // Bottom screen for simple text
     consoleDemoInit();
 
-    for (int i = 0; i < UI_NUM_LINES; i++)
-    {
-        for (int j = 0; j < UI_NUM_CHARS; j++)
-        {
-            UIDisplayBuffer[i][j] = ' ';
-        }
-        UIDisplayBuffer[i][UI_NUM_CHARS] = '\0';
-    }
-
     /*******************
      * Setting up wifi *
      *******************/
@@ -67,13 +60,13 @@ int main(void)
 
     if (!Wifi_InitDefault(INIT_ONLY))
     {
-        snprintf(UIDisplayBuffer[0], UI_NUM_CHARS + 1, "Error initialising Wifi library\n");
+        iprintf("Error initialising Wifi library\n");
         goto skip_rest_wifi_stuff;
     }
     else
     {
         wifi_works = 1;
-        snprintf(UIDisplayBuffer[0], UI_NUM_CHARS + 1, "Wifi library initialised\n");
+        iprintf("Wifi library initialised\n");
     }
     // Use channel 1, can be anything between 1 and 13.
     Wifi_SetChannel(1);
@@ -88,18 +81,12 @@ skip_rest_wifi_stuff:  // Take a guess
     int frame_counter = 0;
     int num_sent = 0;
 
-    snprintf(UIDisplayBuffer[1], UI_NUM_CHARS + 1, "Really basic communication demo\n");
-    snprintf(UIDisplayBuffer[9], UI_NUM_CHARS + 1, "Most recent data sent:\n");
-    snprintf(UIDisplayBuffer[18], UI_NUM_CHARS + 1, "Most recent data received:\n");
-
     while (1)
     {
         consoleClear();
         scanKeys();
         int keys_held = keysHeld();
         int keys_down = keysDown();
-
-        snprintf(UIDisplayBuffer[2], UI_NUM_CHARS + 1, "Frame counter = %d\n", frame_counter);
 
         if (keys_down & KEY_A && wifi_works)
         {
@@ -108,19 +95,11 @@ skip_rest_wifi_stuff:  // Take a guess
             {
                 data[i] = '\0';
             }
-            snprintf(data, 1024, "Hello, World number %d", num_sent);
             int data_length = strlen(data) + 1;
 
-            Wifi_RawTxFrame(data_length, 0x0014, (u16*)data);
+            Wifi_RawTxFrame(data_length, 0x0014, (u16 *)data);
 
-            snprintf(UIDisplayBuffer[8], UI_NUM_CHARS + 1, "chars sent %d\n", data_length);
-            snprintf(UIDisplayBuffer[10], UI_NUM_CHARS + 1, "%s\n", data);
             num_sent++;
-        }
-
-        for (int i = 0; i < UI_NUM_LINES; i++)
-        {
-            iprintf("%s", UIDisplayBuffer[i]);
         }
 
         frame_counter++;
