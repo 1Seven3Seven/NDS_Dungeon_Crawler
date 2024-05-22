@@ -8,73 +8,13 @@
 #include <stdio.h>
 #include <string.h>
 
-#define UI_NUM_CHARS 32  // The width of the ui in characters - non-inclusive of '\0'
-#define UI_NUM_LINES 24  // The height of the ui in lines
-
-char DisplayBuffer[UI_NUM_LINES][UI_NUM_CHARS + 1];
-
-void ClearLine(int line_number)
-{
-    if (line_number < 0 || line_number >= UI_NUM_LINES)
-    {
-        return;
-    }
-
-    memset(DisplayBuffer[line_number], ' ', UI_NUM_CHARS);
-    DisplayBuffer[line_number][UI_NUM_CHARS] = '\0';
-}
-
-void ResetDisplayBuffer()
-{
-    for (int i = 0; i < UI_NUM_LINES; ++i)
-    {
-        memset(DisplayBuffer[i], ' ', UI_NUM_CHARS);
-        DisplayBuffer[i][UI_NUM_CHARS] = '\0';
-    }
-}
-
-void PrintDisplayBuffer()
-{
-    for (int i = 0; i < UI_NUM_LINES; i++)
-    {
-        iprintf("%s", DisplayBuffer[i]);
-    }
-}
-
-void RemoveNullsFromLine(int line_number)
-{
-    for (int i = 0; i < UI_NUM_CHARS; i++)
-    {
-        if (DisplayBuffer[line_number][i] == '\0')
-        {
-            DisplayBuffer[line_number][i] = ' ';
-        }
-    }
-}
-
-int PrintToLine(int line_number, const char *fmt, ...)
-{
-    if (line_number < 0 || line_number >= UI_NUM_LINES)
-    {
-        return 0;
-    }
-
-    ClearLine(line_number);
-
-    va_list args;
-    va_start(args, fmt);
-    int return_value = vsnprintf(DisplayBuffer[line_number], UI_NUM_CHARS + 1, fmt, args);
-    va_end(args);
-
-    RemoveNullsFromLine(line_number);
-
-    return return_value;
-}
+// My libraries
+#include "UI.h"
 
 void packet_handler(int packetID, int packetLength)
 {
-    char data[1024];
-    int data_read = Wifi_RxRawReadPacket(packetID, packetLength, (u16 *)data);
+    // char data[1024];
+    // int data_read = Wifi_RxRawReadPacket(packetID, packetLength, (u16 *)data);
 }
 
 int main(void)
@@ -86,23 +26,53 @@ int main(void)
 
     // Bottom screen for simple text
     consoleDemoInit();
+    UI_ResetDisplayBuffer();
 
-    ResetDisplayBuffer();
+    // A really simple sprite
+    u16 *gfx_red_square = oamAllocateGfx(&oamMain, SpriteSize_32x32, SpriteColorFormat_256Color);
+    u16 *gfx_green_square = oamAllocateGfx(&oamMain, SpriteSize_32x32, SpriteColorFormat_256Color);
+
+    for (int i = 0; i < 32 * 32 / 2; i++)
+    {
+        gfx_red_square[i] = 1 | (1 << 8);
+        gfx_green_square[i] = 2 | (2 << 8);
+    }
+
+    SPRITE_PALETTE[1] = RGB15(31, 0, 0);
+    SPRITE_PALETTE[2] = RGB15(0, 31, 0);
+
+    int my_position[2] = {100, 100};
+
+    oamSet(&oamMain,                        // Oam
+           0,                               // id
+           my_position[0], my_position[1],  // x, y
+           0,                               // priority
+           0,                               // palette alpha
+           SpriteSize_32x32,                // sprite size
+           SpriteColorFormat_256Color,      // colour format
+           gfx_red_square,                  // graphics pointer
+           -1,                              // affine index
+           false,                           // size double
+           false,                           // hide
+           false,                           // h flip
+           false,                           // v flip
+           false                            // mosaic
+    );
 
     /*******************
      * Setting up wifi *
      *******************/
-    int wifi_works = 0;
+    // int wifi_works = 0;
 
     if (!Wifi_InitDefault(INIT_ONLY))
     {
-        PrintToLine(0, "Error initialising Wifi library");
+        UI_PrintToLine(0, "Error initialising Wifi library");
         goto skip_rest_wifi_stuff;
     }
     else
     {
-        wifi_works = 1;
-        PrintToLine(0, "Wifi library initialised");
+        // wifi_works = 1;
+        UI_PrintToLine(0, "Wifi library initialised");
     }
     // Use channel 1, can be anything between 1 and 13.
     Wifi_SetChannel(1);
@@ -114,26 +84,48 @@ int main(void)
 skip_rest_wifi_stuff:  // Take a guess
 
     // Other information to track
+    int frame_counter = 0;
 
     while (1)
     {
         consoleClear();
         scanKeys();
         int keys_held = keysHeld();
-        int keys_down = keysDown();
 
-        if (keys_down & KEY_A && wifi_works)
+        UI_PrintToLine(2, "frame_counter = %d", frame_counter);
+
+        if (keys_held & KEY_LEFT)
         {
-            char data[1024];
-
-            Wifi_RawTxFrame(/* data_length */ +8, 0x0014, (u16 *)data);
+            my_position[0] -= 1;
+        }
+        if (keys_held & KEY_RIGHT)
+        {
+            my_position[0] += 1;
+        }
+        if (keys_held & KEY_UP)
+        {
+            my_position[1] -= 1;
+        }
+        if (keys_held & KEY_DOWN)
+        {
+            my_position[1] += 1;
         }
 
-        PrintDisplayBuffer();
+        UI_PrintToLine(3, "%d, %d", my_position[0], my_position[1]);
+        oamSetXY(&oamMain, 0, my_position[0], my_position[1]);
 
+        // if (wifi_works)
+        // {
+        //     char data[1024];
+
+        //     Wifi_RawTxFrame(/* data_length */ +8, 0x0014, (u16 *)data);
+        // }
+
+        frame_counter++;
+        UI_PrintDisplayBuffer();
         swiWaitForVBlank();
         oamUpdate(&oamMain);
-        if (keys_held & KEY_START) return 0;
+        if (keys_held & KEY_START) break;
     }
 
     return 0;
