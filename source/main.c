@@ -24,6 +24,38 @@ volatile int frame_save = 0;
 volatile int line_to_print_on = 10;
 volatile int previous_line_to_print_on = 10;
 
+void PrintByteArrayAsHex(const u8 *array, int array_len, int line_start, int line_end)
+{
+    if (line_start < 0)
+    {
+        line_start = 0;
+    }
+    if (line_end >= UI_NUM_LINES)
+    {
+        line_end = UI_NUM_LINES - 1;
+    }
+
+    int line_number = line_start;
+    int hex_number = 0;
+    int next_byte = 0;
+
+    while (line_number <= line_end && next_byte < array_len)
+    {
+        UI_ClearLine(line_number);
+
+        while (hex_number < 8 && next_byte < array_len)
+        {
+            snprintf(UI_DisplayBuffer[line_number] + hex_number * 3, 3, "%02x", array[next_byte]);
+            hex_number++;
+            next_byte++;
+        }
+
+        UI_RemoveNullsFromLine(line_number);
+        line_number++;
+        hex_number = 0;
+    }
+}
+
 void packet_handler(int packetID, int packetLength)
 {
     if (frame_counter != frame_save)
@@ -60,6 +92,8 @@ void packet_handler(int packetID, int packetLength)
     {
         goto packet_handler_cleanup;
     }
+
+    // handling code
 
 packet_handler_cleanup:
     free(data);
@@ -163,24 +197,22 @@ int main(void)
 
         if (wifi_works)
         {
-            char data[DATA_LEN + sizeof(Wifi_TxHeader) + 10] = {'\0'};
+            u8 data[DATA_LEN] = {'\0'};
 
-            data[0] = POSITION_INDICATOR;
-            *(int *)(data + sizeof(char)) = htonl(my_position[0]);
-            *(int *)(data + sizeof(char) + sizeof(int)) = htonl(my_position[1]);
+            // data[0] = POSITION_INDICATOR;
+            data[0] = 'H';
+            data[1] = 'e';
+            *(int *)(data + sizeof(int)) = htonl(my_position[0]);
+            *(int *)(data + sizeof(int) * 2) = htonl(my_position[1]);
 
-            Wifi_RawTxFrame(DATA_LEN + sizeof(Wifi_TxHeader) + 10, 0x0014, (u16 *)data);
+            Wifi_RawTxFrame(DATA_LEN, 0x0014, (u16 *)data);
 
-            char _temp1[100] = {'\0'};
-            char string[] = "He";
-            char _temp2[100] = {'\0'};
-            Wifi_RawTxFrame(sizeof(string) + 100, 0x0014, (u16 *)string);
+            // char _temp1[100] = {'\0'};
+            // char string[] = "He";
+            // char _temp2[100] = {'\0'};
+            // Wifi_RawTxFrame(sizeof(string) + 100, 0x0014, (u16 *)string);
 
-            for (int i = 0; i < DATA_LEN; i++)
-            {
-                snprintf(UI_DisplayBuffer[23] + i * 3, 3, "%02x", data[i]);
-            }
-            UI_RemoveNullsFromLine(23);
+            PrintByteArrayAsHex(data, DATA_LEN, 22, UI_NUM_LINES);
         }
 
         frame_counter++;
