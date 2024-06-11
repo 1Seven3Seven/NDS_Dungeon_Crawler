@@ -13,11 +13,11 @@
 #include "UI.h"
 
 // #define DATA_LEN sizeof(char) + sizeof(int) * 2
-#define DATA_LEN sizeof(int) * 3
-#define CHARS_CAN_PRINT 9 < DATA_LEN ? 9 : DATA_LEN
+#define DATA_LEN sizeof(char) * 8 + sizeof(int) * 2
+#define CHARS_CAN_PRINT 10 < DATA_LEN ? 10 : DATA_LEN
 #define POSITION_INDICATOR 0x17
 
-int other_position[2] = {-32, -32};
+volatile int other_position[2] = {-32, -32};
 
 int frame_counter = 0;
 volatile int frame_save = 0;
@@ -56,6 +56,31 @@ void PrintByteArrayAsHex(const u8 *array, int array_len, int line_start, int lin
     }
 }
 
+void PrintPacket(const char *data, int packet_length, int start)
+{
+    UI_DisplayBuffer[line_to_print_on][0] = '>';
+
+    for (int _i = 0; _i < (CHARS_CAN_PRINT < packet_length ? CHARS_CAN_PRINT : packet_length); _i++)
+    {
+        int i = _i + start;
+
+        if (i >= packet_length)
+        {
+            break;
+        }
+
+        snprintf(UI_DisplayBuffer[line_to_print_on] + (i - 8) * 3 + 2, 3, "%02x", data[i]);
+    }
+    UI_RemoveNullsFromLine(line_to_print_on);
+
+    line_to_print_on++;
+
+    if (line_to_print_on >= 20)
+    {
+        line_to_print_on = 10;
+    }
+}
+
 void packet_handler(int packetID, int packetLength)
 {
     if (frame_counter != frame_save)
@@ -74,26 +99,21 @@ void packet_handler(int packetID, int packetLength)
     // int data_read = Wifi_RxRawReadPacket(packetID, packetLength, (u16 *)data);
     Wifi_RxRawReadPacket(packetID, packetLength, (u16 *)data);
 
-    UI_DisplayBuffer[line_to_print_on][0] = '>';
-    for (int i = 0; i < (CHARS_CAN_PRINT < packetLength ? CHARS_CAN_PRINT : packetLength); i++)
+    if (strncmp("Hello, World!", data, 8))
     {
-        snprintf(UI_DisplayBuffer[line_to_print_on] + i * 3 + 2, 3, "%02x", data[i]);
-    }
-    UI_RemoveNullsFromLine(line_to_print_on);
-
-    line_to_print_on++;
-
-    if (line_to_print_on >= 20)
-    {
-        line_to_print_on = 10;
-    }
-
-    if (data[0] != POSITION_INDICATOR)
-    {
+        // UI_PrintToLine(5, "no");
         goto packet_handler_cleanup;
     }
 
-    // handling code
+    PrintPacket(data, packetLength, 8);
+
+    int x = ntohl(*(int *)(data + sizeof(int) * 2));
+    int y = ntohl(*(int *)(data + sizeof(int) * 3));
+
+    other_position[0] = x;
+    other_position[1] = y;
+
+    UI_PrintToLine(5, "%04x, %04x", x, y);
 
 packet_handler_cleanup:
     free(data);
@@ -193,26 +213,36 @@ int main(void)
         }
 
         UI_PrintToLine(3, "%d, %d", my_position[0], my_position[1]);
+        UI_PrintToLine(4, "%d, %d", other_position[0], other_position[1]);
+
         oamSetXY(&oamMain, 0, my_position[0], my_position[1]);
+        oamSetXY(&oamMain, 1, other_position[0], other_position[1]);
 
         if (wifi_works)
         {
             u8 data[DATA_LEN] = {'\0'};
 
-            // data[0] = POSITION_INDICATOR;
+            data[0] = POSITION_INDICATOR;
             data[0] = 'H';
             data[1] = 'e';
             *(int *)(data + sizeof(int)) = htonl(my_position[0]);
             *(int *)(data + sizeof(int) * 2) = htonl(my_position[1]);
 
-            Wifi_RawTxFrame(DATA_LEN, 0x0014, (u16 *)data);
+            // Wifi_RawTxFrame(DATA_LEN, 0x0014, (u16 *)data);
 
-            // char _temp1[100] = {'\0'};
-            // char string[] = "He";
-            // char _temp2[100] = {'\0'};
+            char _temp1[100] = {'\0'};
+            char string[] = "Hello, World!";
+            char *string2 = calloc(30, sizeof(char));
+            strncpy(string2, string, 8);
+            *(int *)(string2 + sizeof(int) * 2) = htonl(my_position[0]);
+            *(int *)(string2 + sizeof(int) * 3) = htonl(my_position[1]);
+            char _temp2[100] = {'\0'};
             // Wifi_RawTxFrame(sizeof(string) + 100, 0x0014, (u16 *)string);
+            Wifi_RawTxFrame(30, 0x0014, (u16 *)string2);
 
-            PrintByteArrayAsHex(data, DATA_LEN, 22, UI_NUM_LINES);
+            PrintByteArrayAsHex(string2, DATA_LEN, 22, UI_NUM_LINES);
+
+            free(string2);
         }
 
         frame_counter++;
