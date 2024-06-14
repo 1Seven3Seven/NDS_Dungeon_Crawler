@@ -17,6 +17,8 @@
 #define CHARS_CAN_PRINT 10 < DATA_LEN ? 10 : DATA_LEN
 #define POSITION_INDICATOR 0x17
 
+#define HEADER_STR "Hello, World!"
+
 volatile int other_position[2] = {-32, -32};
 
 int frame_counter = 0;
@@ -99,7 +101,7 @@ void packet_handler(int packetID, int packetLength)
     // int data_read = Wifi_RxRawReadPacket(packetID, packetLength, (u16 *)data);
     Wifi_RxRawReadPacket(packetID, packetLength, (u16 *)data);
 
-    if (strncmp("Hello, World!", data, 8))
+    if (strncmp(HEADER_STR, data, 8))
     {
         // UI_PrintToLine(5, "no");
         goto packet_handler_cleanup;
@@ -113,7 +115,10 @@ void packet_handler(int packetID, int packetLength)
     other_position[0] = x;
     other_position[1] = y;
 
-    UI_PrintToLine(5, "%04x, %04x", x, y);
+
+    UI_PrintToLine(6, "packet:");
+    UI_PrintToLine(7, "  pos: %04x, %04x", x, y);
+    UI_PrintToLine(8, "  len: %d", packetLength);
 
 packet_handler_cleanup:
     free(data);
@@ -212,35 +217,31 @@ int main(void)
             my_position[1] += 1;
         }
 
-        UI_PrintToLine(3, "%d, %d", my_position[0], my_position[1]);
-        UI_PrintToLine(4, "%d, %d", other_position[0], other_position[1]);
+        UI_PrintToLine(3, "my pos:    %d, %d", my_position[0], my_position[1]);
+        UI_PrintToLine(4, "other pos: %d, %d", other_position[0], other_position[1]);
 
         oamSetXY(&oamMain, 0, my_position[0], my_position[1]);
         oamSetXY(&oamMain, 1, other_position[0], other_position[1]);
 
         if (wifi_works)
         {
-            u8 data[DATA_LEN] = {'\0'};
+            // u8 data[DATA_LEN] = {'\0'};
 
-            data[0] = POSITION_INDICATOR;
-            data[0] = 'H';
-            data[1] = 'e';
-            *(int *)(data + sizeof(int)) = htonl(my_position[0]);
-            *(int *)(data + sizeof(int) * 2) = htonl(my_position[1]);
+            // data[0] = POSITION_INDICATOR;
+            // data[0] = 'H';
+            // data[1] = 'e';
+            // *(int *)(data + sizeof(int)) = htonl(my_position[0]);
+            // *(int *)(data + sizeof(int) * 2) = htonl(my_position[1]);
 
             // Wifi_RawTxFrame(DATA_LEN, 0x0014, (u16 *)data);
 
-            char _temp1[100] = {'\0'};
-            char string[] = "Hello, World!";
             char *string2 = calloc(30, sizeof(char));
-            strncpy(string2, string, 8);
+            strncpy(string2, HEADER_STR, 8);
             *(int *)(string2 + sizeof(int) * 2) = htonl(my_position[0]);
             *(int *)(string2 + sizeof(int) * 3) = htonl(my_position[1]);
-            char _temp2[100] = {'\0'};
-            // Wifi_RawTxFrame(sizeof(string) + 100, 0x0014, (u16 *)string);
             Wifi_RawTxFrame(30, 0x0014, (u16 *)string2);
 
-            PrintByteArrayAsHex(string2, DATA_LEN, 22, UI_NUM_LINES);
+            PrintByteArrayAsHex((u8 *)string2, DATA_LEN, 22, UI_NUM_LINES);
 
             free(string2);
         }
