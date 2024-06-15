@@ -16,4 +16,13 @@ u16 SD_deconstruct_sprite_size(SpriteSize sprite_size);
 /// @param palette_index The palette index to set the pixel to.
 void SD_set_x_y_to_palette_index(u16 *gfx, SpriteSize sprite_size, u8 x, u8 y, u8 palette_index);
 
+/// @brief Draws a circle on a sprite.
+/// @param gfx Pointer to the sprite graphics data in VRAM.
+/// @param sprite_size The sprite size value from the SpriteSize enum.
+/// @param center_x The x-coordinate of the circle's center within the sprite.
+/// @param center_y The y-coordinate of the circle's center within the sprite.
+/// @param radius The radius of the circle.
+/// @param palette_index The palette index to set the circle's pixels to.
+void SD_draw_circle(u16 *gfx, SpriteSize sprite_size, u8 center_x, u8 center_y, u8 radius, u8 palette_index);
+
 #endif
