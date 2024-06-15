@@ -115,7 +115,7 @@ void SD_draw_circle(u16 *gfx, SpriteSize sprite_size, u8 center_x, u8 center_y, 
     }
 
     u16 radius_squared = radius * radius;
-    
+
     for (u8 x = 0; x < sprite_width; x++)
     {
         s8 x_diff = x - center_x;
@@ -130,6 +130,31 @@ void SD_draw_circle(u16 *gfx, SpriteSize sprite_size, u8 center_x, u8 center_y, 
             {
                 SD_set_x_y_to_palette_index(gfx, sprite_size, x, y, palette_index);
             }
+        }
+    }
+}
+
+void SD_draw_square(u16 *gfx, SpriteSize sprite_size, u8 x, u8 y, u8 w, u8 h, u8 palette_index)
+{
+    u16 width_height = SD_deconstruct_sprite_size(sprite_size);
+
+    u8 sprite_width = SD_GET_WIDTH(width_height);
+    u8 sprite_height = SD_GET_HEIGHT(width_height);
+
+    if (x >= sprite_width || y >= sprite_height)
+    {
+        return;
+    }
+
+    for (u8 pixel_x = x; pixel_x < x + w; pixel_x++)
+    {
+        if (pixel_x >= sprite_width) continue;
+
+        for (u8 pixel_y = y; pixel_y < y + h; pixel_y++)
+        {
+            if (pixel_y >= sprite_height) continue;
+
+            SD_set_x_y_to_palette_index(gfx, sprite_size, pixel_x, pixel_y, palette_index);
         }
     }
 }

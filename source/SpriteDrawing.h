@@ -25,4 +25,14 @@ void SD_set_x_y_to_palette_index(u16 *gfx, SpriteSize sprite_size, u8 x, u8 y, u
 /// @param palette_index The palette index to set the circle's pixels to.
 void SD_draw_circle(u16 *gfx, SpriteSize sprite_size, u8 center_x, u8 center_y, u8 radius, u8 palette_index);
 
+/// @brief Draws a square on a sprite.
+/// @param gfx Pointer to the sprite graphics data in VRAM.
+/// @param sprite_size The sprite size value from the SpriteSize enum.
+/// @param x The x-coordinate of the top-left corner of the square within the sprite.
+/// @param y The y-coordinate of the top-left corner of the square within the sprite.
+/// @param w The width of the square.
+/// @param h The height of the square.
+/// @param palette_index The palette index to set the square's pixels to.
+void SD_draw_square(u16 *gfx, SpriteSize sprite_size, u8 x, u8 y, u8 w, u8 h, u8 palette_index);
+
 #endif

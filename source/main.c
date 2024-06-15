@@ -32,8 +32,12 @@ int main(void)
         gfx_red_square[i] = 1 | (1 << 8);
     }
 
+    SD_draw_circle(gfx_red_square, SpriteSize_32x32, 10, 10, 5, 2);
+    SD_draw_square(gfx_red_square, SpriteSize_32x32, 10, 10, 10, 10, 3);
+
     SPRITE_PALETTE[1] = RGB15(31, 0, 0);
     SPRITE_PALETTE[2] = RGB15(0, 31, 0);
+    SPRITE_PALETTE[3] = RGB15(0, 0, 31);
 
     int my_position[2] = {100, 100};
     int frame_counter = 0;
@@ -53,9 +57,6 @@ int main(void)
            false,                           // v flip
            false                            // mosaic
     );
-
-    u8 x = 0, y = 0;
-    u8 palette_index = 2;
 
     while (1)
     {
@@ -83,22 +84,6 @@ int main(void)
         }
 
         oamSetXY(&oamMain, 0, my_position[0], my_position[1]);
-
-        SD_set_x_y_to_palette_index(gfx_red_square, SpriteSize_32x32, x, y, palette_index);
-
-        if (++x >= 32)
-        {
-            x = 0;
-            if (++y >= 32)
-            {
-                y = 0;
-                palette_index++;
-                if (palette_index == 3)
-                {
-                    palette_index = 1;
-                }
-            }
-        }
 
         frame_counter++;
         UI_PrintDisplayBuffer();
