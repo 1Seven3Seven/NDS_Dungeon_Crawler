@@ -51,18 +51,8 @@ u16 SD_deconstruct_sprite_size(SpriteSize sprite_size)
     }
 }
 
-void SD_set_x_y_to_palette_index(u16 *gfx, SpriteSize sprite_size, u8 x, u8 y, u8 palette_index)
+static void set_x_y_to_palette_index(u16 *gfx, u8 sprite_width, u8 x, u8 y, u8 palette_index)
 {
-    u16 width_height = SD_deconstruct_sprite_size(sprite_size);
-
-    u8 sprite_width = SD_GET_WIDTH(width_height);
-    u8 sprite_height = SD_GET_HEIGHT(width_height);
-
-    if (x >= sprite_width || y >= sprite_height)
-    {
-        return;
-    }
-
     // Find the pixel offset
     u16 offset = 0;
 
@@ -100,4 +90,19 @@ void SD_set_x_y_to_palette_index(u16 *gfx, SpriteSize sprite_size, u8 x, u8 y, u
 
     // Finally set the value
     gfx[offset_in_u16] = current_u16;
+}
+
+void SD_set_x_y_to_palette_index(u16 *gfx, SpriteSize sprite_size, u8 x, u8 y, u8 palette_index)
+{
+    u16 width_height = SD_deconstruct_sprite_size(sprite_size);
+
+    u8 sprite_width = SD_GET_WIDTH(width_height);
+    u8 sprite_height = SD_GET_HEIGHT(width_height);
+
+    if (x >= sprite_width || y >= sprite_height)
+    {
+        return;
+    }
+
+    set_x_y_to_palette_index(gfx, sprite_width, x, y, palette_index);
 }
