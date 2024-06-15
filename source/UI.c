@@ -40,6 +40,11 @@ void UI_PrintDisplayBuffer()
 
 void UI_RemoveNullsFromLine(int line_number)
 {
+    if (line_number < 0 || line_number >= UI_NUM_LINES)
+    {
+        return;
+    }
+
     for (int i = 0; i < UI_NUM_CHARS; i++)
     {
         if (UI_DisplayBuffer[line_number][i] == '\0')
