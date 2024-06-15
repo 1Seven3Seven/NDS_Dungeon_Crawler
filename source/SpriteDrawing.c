@@ -51,20 +51,30 @@ u16 SD_deconstruct_sprite_size(SpriteSize sprite_size)
     }
 }
 
-static void set_x_y_to_palette_index(u16 *gfx, u8 sprite_width, u8 x, u8 y, u8 palette_index)
+void SD_set_x_y_to_palette_index(u16 *gfx, SpriteSize sprite_size, u8 x, u8 y, u8 palette_index)
 {
+    u16 width_height = SD_deconstruct_sprite_size(sprite_size);
+
+    u8 sprite_width = SD_GET_WIDTH(width_height);
+    u8 sprite_height = SD_GET_HEIGHT(width_height);
+
+    if (x >= sprite_width || y >= sprite_height)
+    {
+        return;
+    }
+
     // Find the pixel offset
     u16 offset = 0;
 
     // First we get the x and y offset inside of the given 8x8 square we are in
-    int x_in_8x8_square = x % 8;
-    int y_in_8x8_square = y % 8;
+    u8 x_in_8x8_square = x % 8;
+    u8 y_in_8x8_square = y % 8;
 
     offset += x_in_8x8_square + y_in_8x8_square * 8;
 
     // Now we offset by the 8x8 square
-    int x_8x8_square = x / 8;
-    int y_8x8_square = y / 8;
+    u8 x_8x8_square = x / 8;
+    u8 y_8x8_square = y / 8;
 
     offset += 8 * 8 * x_8x8_square;
     offset += 8 * 8 * (sprite_width / 8) * y_8x8_square;
@@ -92,17 +102,34 @@ static void set_x_y_to_palette_index(u16 *gfx, u8 sprite_width, u8 x, u8 y, u8 p
     gfx[offset_in_u16] = current_u16;
 }
 
-void SD_set_x_y_to_palette_index(u16 *gfx, SpriteSize sprite_size, u8 x, u8 y, u8 palette_index)
+void SD_draw_circle(u16 *gfx, SpriteSize sprite_size, u8 center_x, u8 center_y, u8 radius, u8 palette_index)
 {
     u16 width_height = SD_deconstruct_sprite_size(sprite_size);
 
     u8 sprite_width = SD_GET_WIDTH(width_height);
     u8 sprite_height = SD_GET_HEIGHT(width_height);
 
-    if (x >= sprite_width || y >= sprite_height)
+    if (center_x >= sprite_width || center_y >= sprite_height)
     {
         return;
     }
 
-    set_x_y_to_palette_index(gfx, sprite_width, x, y, palette_index);
+    u16 radius_squared = radius * radius;
+    
+    for (u8 x = 0; x < sprite_width; x++)
+    {
+        s8 x_diff = x - center_x;
+
+        for (u8 y = 0; y < sprite_height; y++)
+        {
+            s8 y_diff = y - center_y;
+
+            u16 distance_squared = x_diff * x_diff + y_diff * y_diff;
+
+            if (distance_squared < radius_squared)
+            {
+                SD_set_x_y_to_palette_index(gfx, sprite_size, x, y, palette_index);
+            }
+        }
+    }
 }
