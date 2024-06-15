@@ -35,9 +35,12 @@ int main(void)
     SD_draw_circle(gfx_red_square, SpriteSize_32x32, 10, 10, 5, 2);
     SD_draw_square(gfx_red_square, SpriteSize_32x32, 10, 10, 10, 10, 3);
 
+    SD_draw_line(gfx_red_square, SpriteSize_32x32, 31, 0, 0, 31, 4);
+
     SPRITE_PALETTE[1] = RGB15(31, 0, 0);
     SPRITE_PALETTE[2] = RGB15(0, 31, 0);
     SPRITE_PALETTE[3] = RGB15(0, 0, 31);
+    SPRITE_PALETTE[4] = RGB15(31, 31, 0);
 
     int my_position[2] = {100, 100};
     int frame_counter = 0;

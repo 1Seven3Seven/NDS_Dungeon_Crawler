@@ -35,4 +35,14 @@ void SD_draw_circle(u16 *gfx, SpriteSize sprite_size, u8 center_x, u8 center_y, 
 /// @param palette_index The palette index to set the square's pixels to.
 void SD_draw_square(u16 *gfx, SpriteSize sprite_size, u8 x, u8 y, u8 w, u8 h, u8 palette_index);
 
+/// @brief Draws a line on a sprite using Bresenham's line algorithm.
+/// @param gfx Pointer to the sprite graphics data in VRAM.
+/// @param sprite_size The sprite size value from the SpriteSize enum.
+/// @param x1 The x-coordinate of the start point of the line.
+/// @param y1 The y-coordinate of the start point of the line.
+/// @param x2 The x-coordinate of the end point of the line.
+/// @param y2 The y-coordinate of the end point of the line.
+/// @param palette_index The palette index to set the line's pixels to.
+void SD_draw_line(u16 *gfx, SpriteSize sprite_size, u8 x1, u8 y1, u8 x2, u8 y2, u8 palette_index);
+
 #endif

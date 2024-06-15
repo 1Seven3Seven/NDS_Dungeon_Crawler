@@ -6,6 +6,8 @@
 #define SD_GET_WIDTH(width_height) ((width_height & SD_U16_HIGH_BYTE_MASK) >> 8)
 #define SD_GET_HEIGHT(width_height) (width_height & SD_U16_LOW_BYTE_MASK)
 
+#define LERP(a, b, c) a + c *(b - a)
+
 u16 SD_deconstruct_sprite_size(SpriteSize sprite_size)
 {
     /*
@@ -155,6 +157,48 @@ void SD_draw_square(u16 *gfx, SpriteSize sprite_size, u8 x, u8 y, u8 w, u8 h, u8
             if (pixel_y >= sprite_height) continue;
 
             SD_set_x_y_to_palette_index(gfx, sprite_size, pixel_x, pixel_y, palette_index);
+        }
+    }
+}
+
+void SD_draw_line(u16 *gfx, SpriteSize sprite_size, u8 x1, u8 y1, u8 x2, u8 y2, u8 palette_index)
+{
+    u16 width_height = SD_deconstruct_sprite_size(sprite_size);
+
+    u8 sprite_width = SD_GET_WIDTH(width_height);
+    u8 sprite_height = SD_GET_HEIGHT(width_height);
+
+    if (x1 >= sprite_width || y1 >= sprite_height || x2 >= sprite_width || y2 >= sprite_height)
+    {
+        return;
+    }
+
+    int x_diff = x1 - x2;
+    if (x_diff < 0) x_diff = -x_diff;
+    int y_diff = y1 - y2;
+    if (y_diff > 0) y_diff = -y_diff;
+
+    int x_step = x1 < x2 ? 1 : -1;
+    int y_step = y1 < y2 ? 1 : -1;
+    int error = x_diff + y_diff;
+
+    while (1)
+    {
+        SD_set_x_y_to_palette_index(gfx, sprite_size, x1, y1, palette_index);
+
+        if (x1 == x2 && y1 == y2) break;
+
+        int error2 = error * 2;
+
+        if (error2 >= y_diff)
+        {
+            error += y_diff;
+            x1 += x_step;
+        }
+        if (error2 <= x_diff)
+        {
+            error += x_diff;
+            y1 += y_step;
         }
     }
 }
