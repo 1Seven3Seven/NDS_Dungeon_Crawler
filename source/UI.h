@@ -1,6 +1,8 @@
 #ifndef UI_H
 #define UI_H
 
+#include <nds.h>
+
 #define UI_NUM_CHARS 32  // The width of the ui in characters - non-inclusive of '\0'
 #define UI_NUM_LINES 24  // The height of the ui in lines
 
