@@ -70,3 +70,35 @@ void UI_PrintToLine(int line_number, const char *fmt, ...)
 
     UI_RemoveNullsFromLine(line_number);
 }
+
+void UI_PrintU16Bits(int line_number, u16 some_u16)
+{
+    if (line_number < 0 || line_number >= UI_NUM_LINES)
+    {
+        return;
+    }
+
+    UI_ClearLine(line_number);
+
+    for (int i = 0; i < 16; i++)
+    {
+        int bit = (some_u16 >> (15 - i)) & 1;
+        UI_DisplayBuffer[line_number][i] = '0' + bit;
+    }
+}
+
+void UI_PrintU32Bits(int line_number, u32 some_u32)
+{
+    if (line_number < 0 || line_number >= UI_NUM_LINES)
+    {
+        return;
+    }
+
+    UI_ClearLine(line_number);
+
+    for (int i = 0; i < 32; i++)
+    {
+        int bit = (some_u32 >> (31 - i)) & 1;
+        UI_DisplayBuffer[line_number][i] = '0' + bit;
+    }
+}

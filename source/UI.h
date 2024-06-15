@@ -21,4 +21,10 @@ void UI_RemoveNullsFromLine(int line_number);
 // A wrapper for printf, prints to the given line in the display buffer.
 void UI_PrintToLine(int line_number, const char *fmt, ...);
 
+// Prints the bits of a unsigned 16 bit integer
+void UI_PrintU16Bits(int line_number, u16 some_u16);
+
+// Prints the bits of a unsigned 32 bit integer
+void UI_PrintU32Bits(int line_number, u32 some_u32);
+
 #endif
