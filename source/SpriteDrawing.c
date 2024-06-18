@@ -53,6 +53,19 @@ u16 SD_deconstruct_sprite_size(SpriteSize sprite_size)
     }
 }
 
+void SD_fill(u16 *gfx, SpriteSize sprite_size, u8 palette_index)
+{
+    u16 width_height = SD_deconstruct_sprite_size(sprite_size);
+
+    u8 sprite_width = SD_GET_WIDTH(width_height);
+    u8 sprite_height = SD_GET_HEIGHT(width_height);
+
+    for (int i = 0; i < sprite_width * sprite_height / 2; i++)
+    {
+        gfx[i] = palette_index | (palette_index << 8);
+    }
+}
+
 void SD_set_x_y_to_palette_index(u16 *gfx, SpriteSize sprite_size, u8 x, u8 y, u8 palette_index)
 {
     u16 width_height = SD_deconstruct_sprite_size(sprite_size);

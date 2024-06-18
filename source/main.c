@@ -13,6 +13,27 @@
 #include "SpriteDrawing.h"
 #include "UI.h"
 
+void draw_sprite(u16 *gfx)
+{
+    // Draw head
+    SD_draw_circle(gfx, SpriteSize_32x32, 16, 6, 5, 2);
+
+    // Draw body
+    SD_draw_line(gfx, SpriteSize_32x32, 16, 11, 16, 24, 2);
+
+    // Draw left arm
+    SD_draw_line(gfx, SpriteSize_32x32, 16, 14, 10, 20, 2);
+
+    // Draw right arm
+    SD_draw_line(gfx, SpriteSize_32x32, 16, 14, 22, 20, 2);
+
+    // Draw left leg
+    SD_draw_line(gfx, SpriteSize_32x32, 16, 24, 12, 30, 2);
+
+    // Draw right leg
+    SD_draw_line(gfx, SpriteSize_32x32, 16, 24, 20, 30, 2);
+}
+
 int main(void)
 {
     // Setting up the top screen for sprites
@@ -25,17 +46,14 @@ int main(void)
     UI_ResetDisplayBuffer();
 
     // A really simple sprite
-    u16 *gfx_red_square = oamAllocateGfx(&oamMain, SpriteSize_32x32, SpriteColorFormat_256Color);
+    u16 *gfx = oamAllocateGfx(&oamMain, SpriteSize_32x32, SpriteColorFormat_256Color);
 
-    for (int i = 0; i < 32 * 32 / 2; i++)
-    {
-        gfx_red_square[i] = 1 | (1 << 8);
-    }
+    SD_fill(gfx, SpriteSize_32x32, 0);
+    draw_sprite(gfx);
 
-    SD_draw_circle(gfx_red_square, SpriteSize_32x32, 10, 10, 5, 2);
-    SD_draw_square(gfx_red_square, SpriteSize_32x32, 10, 10, 10, 10, 3);
-
-    SD_draw_line(gfx_red_square, SpriteSize_32x32, 31, 0, 0, 31, 4);
+    // SD_draw_circle(gfx, SpriteSize_32x32, 10, 10, 5, 2);
+    // SD_draw_square(gfx, SpriteSize_32x32, 10, 10, 10, 10, 3);
+    // SD_draw_line(gfx, SpriteSize_32x32, 31, 0, 0, 31, 4);
 
     SPRITE_PALETTE[1] = RGB15(31, 0, 0);
     SPRITE_PALETTE[2] = RGB15(0, 31, 0);
@@ -52,7 +70,7 @@ int main(void)
            0,                               // palette alpha
            SpriteSize_32x32,                // sprite size
            SpriteColorFormat_256Color,      // colour format
-           gfx_red_square,                  // graphics pointer
+           gfx,                             // graphics pointer
            -1,                              // affine index
            false,                           // size double
            false,                           // hide

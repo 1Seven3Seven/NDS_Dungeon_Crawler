@@ -8,6 +8,12 @@
 /// @return A u16 value where the higher byte represents the width and the lower byte represents the height.
 u16 SD_deconstruct_sprite_size(SpriteSize sprite_size);
 
+/// @brief Fills the sprite with the given palette index.
+/// @param gfx Pointer to the sprite graphics data in VRAM.
+/// @param sprite_size The sprite size value from the SpriteSize enum.
+/// @param palette_index The palette index to set the pixel to.
+void SD_fill(u16 *gfx, SpriteSize sprite_size, u8 palette_index);
+
 /// @brief Sets a specific pixel in a sprite to a particular palette index.
 /// @param gfx Pointer to the sprite graphics data in VRAM.
 /// @param sprite_size The sprite size value from the SpriteSize enum.
