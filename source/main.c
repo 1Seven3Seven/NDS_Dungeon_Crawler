@@ -16,6 +16,54 @@
 #include "SpriteDrawing.h"
 #include "UI.h"
 
+#define SPRITE_SIZE 16 * 16
+#define SPRITES_PER_ROW 8
+#define ROW_OFFSET SPRITE_SIZE *SPRITES_PER_ROW
+
+void animate_player(u16 *player_gfx, int moving, int frame_counter)
+{
+    if (moving)
+    {
+        dmaCopy((u8 *)SpriteSheetTiles + SPRITE_SIZE * (2 + (frame_counter / 10) % 2), player_gfx, SPRITE_SIZE);
+    }
+    else
+    {
+        dmaCopy((u8 *)SpriteSheetTiles + SPRITE_SIZE * ((frame_counter / 30) % 2), player_gfx, SPRITE_SIZE);
+    }
+}
+
+void animate_skeleton(u16 *skeleton_gfx, int moving, int frame_counter)
+{
+    if (moving)
+    {
+        dmaCopy((u8 *)SpriteSheetTiles + ROW_OFFSET + SPRITE_SIZE * (2 + (frame_counter / 10) % 2),  //
+                skeleton_gfx,                                                                        //
+                SPRITE_SIZE);
+    }
+    else
+    {
+        dmaCopy((u8 *)SpriteSheetTiles + ROW_OFFSET + SPRITE_SIZE * ((frame_counter / 30) % 2),  //
+                skeleton_gfx,                                                                    //
+                SPRITE_SIZE);
+    }
+}
+
+void animate_slime(u16 *slime_gfx, int moving, int frame_counter)
+{
+    if (moving)
+    {
+        dmaCopy((u8 *)SpriteSheetTiles + ROW_OFFSET * 2 + SPRITE_SIZE * (2 + (frame_counter / 10) % 2),  //
+                slime_gfx,                                                                               //
+                SPRITE_SIZE);
+    }
+    else
+    {
+        dmaCopy((u8 *)SpriteSheetTiles + ROW_OFFSET * 2 + SPRITE_SIZE * ((frame_counter / 30) % 2),  //
+                slime_gfx,                                                                           //
+                SPRITE_SIZE);
+    }
+}
+
 int main(void)
 {
     // Setting up the top screen for sprites
@@ -27,8 +75,16 @@ int main(void)
     consoleDemoInit();
     UI_ResetDisplayBuffer();
 
-    u16 *gfx = oamAllocateGfx(&oamMain, SpriteSize_16x16, SpriteColorFormat_256Color);
-    dmaCopy((u8 *)SpriteSheetTiles, gfx, 16 * 16);
+    // Loading some graphics
+
+    u16 *player_gfx = oamAllocateGfx(&oamMain, SpriteSize_16x16, SpriteColorFormat_256Color);
+    dmaCopy((u8 *)SpriteSheetTiles, player_gfx, SPRITE_SIZE);
+
+    u16 *skeleton_gfx = oamAllocateGfx(&oamMain, SpriteSize_16x16, SpriteColorFormat_256Color);
+    dmaCopy((u8 *)SpriteSheetTiles + ROW_OFFSET, skeleton_gfx, SPRITE_SIZE);
+
+    u16 *slime_gfx = oamAllocateGfx(&oamMain, SpriteSize_16x16, SpriteColorFormat_256Color);
+    dmaCopy((u8 *)SpriteSheetTiles + ROW_OFFSET * 2, slime_gfx, SPRITE_SIZE);
 
     dmaCopy(SpriteSheetPal, SPRITE_PALETTE, SpriteSheetPalLen);
 
@@ -43,13 +99,45 @@ int main(void)
            0,                               // palette alpha
            SpriteSize_16x16,                // sprite size
            SpriteColorFormat_256Color,      // colour format
-           gfx,                             // graphics pointer
+           player_gfx,                      // graphics pointer
            -1,                              // affine index
            false,                           // size double
            false,                           // hide
            false,                           // h flip
            false,                           // v flip
            false                            // mosaic
+    );
+
+    oamSet(&oamMain,                    // Oam
+           1,                           // id
+           10, 10,                      // x, y
+           0,                           // priority
+           0,                           // palette alpha
+           SpriteSize_16x16,            // sprite size
+           SpriteColorFormat_256Color,  // colour format
+           skeleton_gfx,                // graphics pointer
+           -1,                          // affine index
+           false,                       // size double
+           false,                       // hide
+           false,                       // h flip
+           false,                       // v flip
+           false                        // mosaic
+    );
+
+    oamSet(&oamMain,                    // Oam
+           2,                           // id
+           10, 50,                      // x, y
+           0,                           // priority
+           0,                           // palette alpha
+           SpriteSize_16x16,            // sprite size
+           SpriteColorFormat_256Color,  // colour format
+           slime_gfx,                   // graphics pointer
+           -1,                          // affine index
+           false,                       // size double
+           false,                       // hide
+           false,                       // h flip
+           false,                       // v flip
+           false                        // mosaic
     );
 
     while (1)
@@ -85,14 +173,9 @@ int main(void)
 
         oamSetXY(&oamMain, 0, my_position[0], my_position[1]);
 
-        if (moving)
-        {
-            dmaCopy((u8 *)SpriteSheetTiles + 16 * 16 * ((frame_counter / 10) % 2 + 1), gfx, 16 * 16);
-        }
-        else
-        {
-            dmaCopy((u8 *)SpriteSheetTiles, gfx, 16 * 16);
-        }
+        animate_player(player_gfx, moving, frame_counter);
+        animate_skeleton(skeleton_gfx, 0, frame_counter);
+        animate_slime(slime_gfx, 0, frame_counter);
 
         frame_counter++;
         UI_PrintDisplayBuffer();
