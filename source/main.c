@@ -14,6 +14,7 @@
 
 // My libraries
 #include "Entity.h"
+#include "Skeleton.h"
 #include "SpriteDrawing.h"
 #include "UI.h"
 
@@ -23,7 +24,7 @@
 
 void animate_player(u16 *player_gfx, int frame_counter, Entity *player_entity)
 {
-    if (EN_get_state_bit(player_entity, ENTITY_MOVING_BIT))
+    if (EN_get_state_bit(player_entity, EN_MOVING_BIT))
     {
         player_entity->animation_frame_number = 2 + (frame_counter / 10) % 2;
     }
@@ -35,20 +36,20 @@ void animate_player(u16 *player_gfx, int frame_counter, Entity *player_entity)
     dmaCopy((u8 *)SpriteSheetTiles + SPRITE_SIZE * player_entity->animation_frame_number, player_gfx, SPRITE_SIZE);
 }
 
-void animate_skeleton(u16 *skeleton_gfx, int moving, int frame_counter)
+void animate_skeleton(u16 *skeleton_gfx, int frame_counter, Entity *skeleton_entity)
 {
-    if (moving)
+    if (EN_get_state_bit(skeleton_entity, EN_MOVING_BIT))
     {
-        dmaCopy((u8 *)SpriteSheetTiles + ROW_OFFSET + SPRITE_SIZE * (2 + (frame_counter / 10) % 2),  //
-                skeleton_gfx,                                                                        //
-                SPRITE_SIZE);
+        skeleton_entity->animation_frame_number = 2 + (frame_counter / 10) % 2;
     }
     else
     {
-        dmaCopy((u8 *)SpriteSheetTiles + ROW_OFFSET + SPRITE_SIZE * ((frame_counter / 30) % 2),  //
-                skeleton_gfx,                                                                    //
-                SPRITE_SIZE);
+        skeleton_entity->animation_frame_number = (frame_counter / 30) % 2;
     }
+
+    dmaCopy((u8 *)SpriteSheetTiles + ROW_OFFSET + SPRITE_SIZE * skeleton_entity->animation_frame_number,  //
+            skeleton_gfx,                                                                                 //
+            SPRITE_SIZE);
 }
 
 void animate_slime(u16 *slime_gfx, int moving, int frame_counter)
@@ -86,7 +87,7 @@ int main(void)
     dmaCopy((u8 *)SpriteSheetTiles, player_gfx, SPRITE_SIZE);
 
     Entity skeleton_entity;
-    EN_init(&skeleton_entity);
+    EN_setup(&skeleton_entity, 10, 10, 32, 32, 1, 1);
     u16 *skeleton_gfx = oamAllocateGfx(&oamMain, SpriteSize_16x16, SpriteColorFormat_256Color);
     dmaCopy((u8 *)SpriteSheetTiles + ROW_OFFSET, skeleton_gfx, SPRITE_SIZE);
 
@@ -115,20 +116,20 @@ int main(void)
            false                              // mosaic
     );
 
-    oamSet(&oamMain,                    // Oam
-           1,                           // id
-           10, 10,                      // x, y
-           0,                           // priority
-           0,                           // palette alpha
-           SpriteSize_16x16,            // sprite size
-           SpriteColorFormat_256Color,  // colour format
-           skeleton_gfx,                // graphics pointer
-           -1,                          // affine index
-           false,                       // size double
-           false,                       // hide
-           false,                       // h flip
-           false,                       // v flip
-           false                        // mosaic
+    oamSet(&oamMain,                              // Oam
+           1,                                     // id
+           skeleton_entity.x, skeleton_entity.y,  // x, y
+           0,                                     // priority
+           0,                                     // palette alpha
+           SpriteSize_16x16,                      // sprite size
+           SpriteColorFormat_256Color,            // colour format
+           skeleton_gfx,                          // graphics pointer
+           -1,                                    // affine index
+           false,                                 // size double
+           false,                                 // hide
+           false,                                 // h flip
+           false,                                 // v flip
+           false                                  // mosaic
     );
 
     oamSet(&oamMain,                    // Oam
@@ -156,33 +157,36 @@ int main(void)
         UI_PrintToLine(0, "frame_counter = %d", frame_counter);
 
         // Clear the moving bit
-        EN_clear_state_bit(&player_entity, ENTITY_MOVING_BIT);
+        EN_clear_state_bit(&player_entity, EN_MOVING_BIT);
 
         if (keys_held & KEY_LEFT)
         {
             player_entity.x -= 1;
-            EN_set_state_bit(&player_entity, ENTITY_MOVING_BIT);
+            EN_set_state_bit(&player_entity, EN_MOVING_BIT);
         }
         if (keys_held & KEY_RIGHT)
         {
             player_entity.x += 1;
-            EN_set_state_bit(&player_entity, ENTITY_MOVING_BIT);
+            EN_set_state_bit(&player_entity, EN_MOVING_BIT);
         }
         if (keys_held & KEY_UP)
         {
             player_entity.y -= 1;
-            EN_set_state_bit(&player_entity, ENTITY_MOVING_BIT);
+            EN_set_state_bit(&player_entity, EN_MOVING_BIT);
         }
         if (keys_held & KEY_DOWN)
         {
             player_entity.y += 1;
-            EN_set_state_bit(&player_entity, ENTITY_MOVING_BIT);
+            EN_set_state_bit(&player_entity, EN_MOVING_BIT);
         }
 
+        SK_update(&skeleton_entity, player_entity);
+
         oamSetXY(&oamMain, 0, player_entity.x, player_entity.y);
+        oamSetXY(&oamMain, 1, skeleton_entity.x, skeleton_entity.y);
 
         animate_player(player_gfx, frame_counter, &player_entity);
-        animate_skeleton(skeleton_gfx, 0, frame_counter);
+        animate_skeleton(skeleton_gfx, frame_counter, &skeleton_entity);
         animate_slime(slime_gfx, 0, frame_counter);
 
         UI_PrintU16Bits(5, player_entity.state);
