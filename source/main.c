@@ -22,6 +22,34 @@
 #define SPRITES_PER_ROW 8
 #define ROW_OFFSET SPRITE_SIZE *SPRITES_PER_ROW
 
+void move_player(Entity *player, int keys)
+{
+    EN_clear_state_bit(player, EN_MOVING_BIT);
+
+    if (keys & KEY_LEFT)
+    {
+        player->x -= 1;
+        EN_set_state_bit(player, EN_MOVING_BIT);
+    }
+    if (keys & KEY_RIGHT)
+    {
+        player->x += 1;
+        EN_set_state_bit(player, EN_MOVING_BIT);
+    }
+    if (keys & KEY_UP)
+    {
+        player->y -= 1;
+        EN_set_state_bit(player, EN_MOVING_BIT);
+    }
+    if (keys & KEY_DOWN)
+    {
+        player->y += 1;
+        EN_set_state_bit(player, EN_MOVING_BIT);
+    }
+
+    oamSetXY(&oamMain, 0, player->x, player->y);
+}
+
 void animate_player(u16 *player_gfx, int frame_counter, Entity *player_entity)
 {
     if (EN_get_state_bit(player_entity, EN_MOVING_BIT))
@@ -156,33 +184,9 @@ int main(void)
 
         UI_PrintToLine(0, "frame_counter = %d", frame_counter);
 
-        // Clear the moving bit
-        EN_clear_state_bit(&player_entity, EN_MOVING_BIT);
-
-        if (keys_held & KEY_LEFT)
-        {
-            player_entity.x -= 1;
-            EN_set_state_bit(&player_entity, EN_MOVING_BIT);
-        }
-        if (keys_held & KEY_RIGHT)
-        {
-            player_entity.x += 1;
-            EN_set_state_bit(&player_entity, EN_MOVING_BIT);
-        }
-        if (keys_held & KEY_UP)
-        {
-            player_entity.y -= 1;
-            EN_set_state_bit(&player_entity, EN_MOVING_BIT);
-        }
-        if (keys_held & KEY_DOWN)
-        {
-            player_entity.y += 1;
-            EN_set_state_bit(&player_entity, EN_MOVING_BIT);
-        }
+        move_player(&player_entity, keys_held);
 
         SK_update(&skeleton_entity, player_entity);
-
-        oamSetXY(&oamMain, 0, player_entity.x, player_entity.y);
         oamSetXY(&oamMain, 1, skeleton_entity.x, skeleton_entity.y);
 
         animate_player(player_gfx, frame_counter, &player_entity);
