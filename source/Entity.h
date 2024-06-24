@@ -3,8 +3,8 @@
 
 #include <nds.h>
 
-#define ENTITY_ALIVE_BIT 0
-#define ENTITY_MOVING_BIT 1
+#define EN_ALIVE_BIT 0
+#define EN_MOVING_BIT 1
 
 typedef struct _Entity
 {
@@ -64,12 +64,12 @@ int EN_setup_in_array(Entity entity_array[], int array_len,  //
 void EN_take_damage(Entity *entity, int damage);
 
 /// Set the `bit`th bit of the state
-inline void EN_set_state_bit(Entity *entity, int bit) { entity->state |= 1 << bit; }
+void EN_set_state_bit(Entity *entity, int bit);
 
 /// Clears the `bit`th bit of the state
-inline void EN_clear_state_bit(Entity *entity, int bit) { entity->state &= ~(1 << bit); }
+void EN_clear_state_bit(Entity *entity, int bit);
 
 /// Gets the `bit`th bit of the state
-inline int EN_get_state_bit(Entity *entity, int bit) { return entity->state & (1 << bit); }
+int EN_get_state_bit(Entity *entity, int bit);
 
 #endif

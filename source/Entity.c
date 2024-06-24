@@ -28,7 +28,7 @@ void EN_setup(Entity *entity, int x, int y, u8 w, u8 h, u16 max_health, u8 attac
 
     entity->animation_frame_number = 0;
 
-    EN_set_state_bit(entity, ENTITY_ALIVE_BIT);
+    EN_set_state_bit(entity, EN_ALIVE_BIT);
     entity->state_counter = 0;
 }
 
@@ -54,3 +54,9 @@ void EN_take_damage(Entity *entity, int damage)
         entity->state = 0;
     }
 }
+
+void EN_set_state_bit(Entity *entity, int bit) { entity->state |= 1 << bit; }
+
+void EN_clear_state_bit(Entity *entity, int bit) { entity->state &= ~(1 << bit); }
+
+int EN_get_state_bit(Entity *entity, int bit) { return entity->state & (1 << bit); }
