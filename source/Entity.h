@@ -64,12 +64,12 @@ int EN_setup_in_array(Entity entity_array[], int array_len,  //
 void EN_take_damage(Entity *entity, int damage);
 
 /// Set the `bit`th bit of the state
-inline void EN_set_state_bit(Entity *entity, int bit);
+inline void EN_set_state_bit(Entity *entity, int bit) { entity->state |= 1 << bit; }
 
 /// Clears the `bit`th bit of the state
-inline void EN_clear_state_bit(Entity *entity, int bit);
+inline void EN_clear_state_bit(Entity *entity, int bit) { entity->state &= ~(1 << bit); }
 
 /// Gets the `bit`th bit of the state
-inline int EN_get_state_bit(Entity *entity, int bit);
+inline int EN_get_state_bit(Entity *entity, int bit) { return entity->state & (1 << bit); }
 
 #endif

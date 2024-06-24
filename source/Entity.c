@@ -54,18 +54,3 @@ void EN_take_damage(Entity *entity, int damage)
         entity->state = 0;
     }
 }
-
-extern inline void EN_set_state_bit(Entity *entity, int bit)
-{
-    entity->state |= 1 << bit;  //
-}
-
-extern inline void EN_clear_state_bit(Entity *entity, int bit)
-{
-    entity->state &= ~(1 << bit);  //
-}
-
-extern inline int EN_get_state_bit(Entity *entity, int bit)
-{
-    return entity->state & (1 << bit);  //
-}
