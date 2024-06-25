@@ -1,19 +1,19 @@
 #include "Entity.h"
 
-void EN_init(Entity *entity)
+void EN_Init(Entity *entity)
 {
     entity->state = 0;  //
 }
 
-void EN_init_array(Entity entity_array[], int array_len)
+void EN_InitArray(Entity entity_array[], int array_len)
 {
     for (int i = 0; i < array_len; i++)
     {
-        EN_init(&entity_array[i]);
+        EN_Init(&entity_array[i]);
     }
 }
 
-void EN_setup(Entity *entity, int x, int y, u8 w, u8 h, u16 max_health, u8 attack_delay)
+void EN_Setup(Entity *entity, int x, int y, u8 w, u8 h, u16 max_health, u8 attack_delay)
 {
     entity->x = (float)x;
     entity->y = (float)y;
@@ -28,17 +28,17 @@ void EN_setup(Entity *entity, int x, int y, u8 w, u8 h, u16 max_health, u8 attac
 
     entity->animation_frame_number = 0;
 
-    EN_set_state_bit(entity, EN_ALIVE_BIT);
+    EN_SetStateBit(entity, EN_ALIVE_BIT);
     entity->state_counter = 0;
 }
 
-int EN_setup_in_array(Entity entity_array[], int array_len, int x, int y, u8 w, u8 h, u16 max_health, u8 attack_delay)
+int EN_SetupInSrray(Entity entity_array[], int array_len, int x, int y, u8 w, u8 h, u16 max_health, u8 attack_delay)
 {
     for (int i = 0; i < array_len; i++)
     {
         if (!entity_array[i].state)
         {
-            EN_setup(&entity_array[i], x, y, w, h, max_health, attack_delay);
+            EN_Setup(&entity_array[i], x, y, w, h, max_health, attack_delay);
             return i;
         }
     }
@@ -46,7 +46,7 @@ int EN_setup_in_array(Entity entity_array[], int array_len, int x, int y, u8 w, 
     return -1;
 }
 
-void EN_take_damage(Entity *entity, int damage)
+void EN_TakeDamage(Entity *entity, int damage)
 {
     entity->health -= damage;
     if (entity->health <= 0)
@@ -55,8 +55,8 @@ void EN_take_damage(Entity *entity, int damage)
     }
 }
 
-void EN_set_state_bit(Entity *entity, int bit) { entity->state |= 1 << bit; }
+void EN_SetStateBit(Entity *entity, int bit) { entity->state |= 1 << bit; }
 
-void EN_clear_state_bit(Entity *entity, int bit) { entity->state &= ~(1 << bit); }
+void EN_ClearStateBit(Entity *entity, int bit) { entity->state &= ~(1 << bit); }
 
-int EN_get_state_bit(Entity *entity, int bit) { return entity->state & (1 << bit); }
+int EN_GetStateBit(Entity *entity, int bit) { return entity->state & (1 << bit); }

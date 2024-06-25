@@ -38,13 +38,13 @@ typedef struct _Entity
 } Entity;
 
 /// Sets up the entity to a default, dead, state.
-void EN_init(Entity *entity);
+void EN_Init(Entity *entity);
 
 /// Calls Entity_init on every entity in the given array.
-void EN_init_array(Entity entity_array[], int array_len);
+void EN_InitArray(Entity entity_array[], int array_len);
 
 /// Sets up the entity.
-void EN_setup(Entity *entity,  //
+void EN_Setup(Entity *entity,  //
               int x, int y,    //
               u8 w, u8 h,      //
               u16 max_health,  //
@@ -53,23 +53,23 @@ void EN_setup(Entity *entity,  //
 /// Finds the first avaliable space in the given array to set up the entity.
 /// Returns the index of the setup entity if successful.
 /// Returns -1 if not successful.
-int EN_setup_in_array(Entity entity_array[], int array_len,  //
-                      int x, int y,                          //
-                      u8 w, u8 h,                            //
-                      u16 max_health,                        //
-                      u8 attack_delay);
+int EN_SetupInSrray(Entity entity_array[], int array_len,  //
+                    int x, int y,                          //
+                    u8 w, u8 h,                            //
+                    u16 max_health,                        //
+                    u8 attack_delay);
 
 /// Applies the given damage to the entity.
 /// If the entity will die, the state is set to 0.
-void EN_take_damage(Entity *entity, int damage);
+void EN_TakeDamage(Entity *entity, int damage);
 
 /// Set the `bit`th bit of the state
-void EN_set_state_bit(Entity *entity, int bit);
+void EN_SetStateBit(Entity *entity, int bit);
 
 /// Clears the `bit`th bit of the state
-void EN_clear_state_bit(Entity *entity, int bit);
+void EN_ClearStateBit(Entity *entity, int bit);
 
 /// Gets the `bit`th bit of the state
-int EN_get_state_bit(Entity *entity, int bit);
+int EN_GetStateBit(Entity *entity, int bit);
 
 #endif

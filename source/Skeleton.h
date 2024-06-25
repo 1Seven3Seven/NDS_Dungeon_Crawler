@@ -4,6 +4,6 @@
 #include "Entity.h"
 
 ///
-void SK_update(Entity *skeleton, Entity player);
+void SK_Update(Entity *skeleton, Entity player);
 
 #endif

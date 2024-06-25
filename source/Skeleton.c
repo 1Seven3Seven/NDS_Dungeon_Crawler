@@ -1,13 +1,13 @@
 #include "Skeleton.h"
 
-void SK_update(Entity *skeleton, Entity player)
+void SK_Update(Entity *skeleton, Entity player)
 {
     float x_diff = player.x - skeleton->x;
     float y_diff = player.y - skeleton->y;
 
     if ((abs(x_diff) + abs(y_diff)) < 32)
     {
-        EN_clear_state_bit(skeleton, EN_MOVING_BIT);
+        EN_ClearStateBit(skeleton, EN_MOVING_BIT);
         return;
     }
 
@@ -26,5 +26,5 @@ void SK_update(Entity *skeleton, Entity player)
     skeleton->x += x_move;
     skeleton->y += y_move;
 
-    EN_set_state_bit(skeleton, EN_MOVING_BIT);
+    EN_SetStateBit(skeleton, EN_MOVING_BIT);
 }
