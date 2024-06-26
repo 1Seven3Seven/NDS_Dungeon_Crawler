@@ -10,6 +10,7 @@
 #include <string.h>
 
 // Spritesheet
+#include "BasicBackground.h"
 #include "SpriteSheet.h"
 
 // My libraries
@@ -101,11 +102,18 @@ int main(void)
     // Setting up the top screen for sprites
     videoSetMode(MODE_0_2D | DISPLAY_BG0_ACTIVE);
     vramSetBankA(VRAM_A_MAIN_SPRITE);
+    vramSetBankB(VRAM_B_MAIN_BG_0x06000000);
     oamInit(&oamMain, SpriteMapping_1D_128, false);
 
     // Bottom screen for simple text
     consoleDemoInit();
     UI_ResetDisplayBuffer();
+
+    // Background
+    int bg = bgInit(0, BgType_Text8bpp, BgSize_T_512x512, 0, 1);
+    dmaCopy(BasicBackgroundTiles, BG_TILE_RAM(1), BasicBackgroundTilesLen);
+    dmaCopy(BasicBackgroundMap, BG_MAP_RAM(0), BasicBackgroundMapLen);
+    dmaCopy(BasicBackgroundPal, BG_PALETTE, BasicBackgroundPalLen);
 
     // Loading some graphics
 
@@ -127,6 +135,7 @@ int main(void)
     dmaCopy(SpriteSheetPal, SPRITE_PALETTE, SpriteSheetPalLen);
 
     int frame_counter = 0;
+    int scroll_x = 0, scroll_y = 0;
 
     oamSet(&oamMain,                          // Oam
            0,                                 // id
@@ -186,6 +195,13 @@ int main(void)
 
         move_player(&player_entity, keys_held);
 
+        if (keys_held & KEY_X) scroll_y -= 1;
+        if (keys_held & KEY_B) scroll_y += 1;
+        if (keys_held & KEY_Y) scroll_x -= 1;
+        if (keys_held & KEY_A) scroll_x += 1;
+
+        bgSetScroll(bg, scroll_x, scroll_y);
+
         SK_Update(&skeleton_entity, player_entity);
         oamSetXY(&oamMain, 1, skeleton_entity.x, skeleton_entity.y);
 
@@ -193,12 +209,13 @@ int main(void)
         animate_skeleton(skeleton_gfx, frame_counter, &skeleton_entity);
         animate_slime(slime_gfx, 0, frame_counter);
 
-        UI_PrintU16Bits(5, player_entity.state);
+        UI_PrintToLine(3, "Scroll = (%03d, %03d)", scroll_x, scroll_y);
 
         frame_counter++;
         UI_PrintDisplayBuffer();
         swiWaitForVBlank();
         oamUpdate(&oamMain);
+        bgUpdate();
         if (keys_held & KEY_START) break;
     }
 
