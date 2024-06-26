@@ -244,50 +244,35 @@ int main(void)
         int scroll_x = player_centre_x - SCROLL_OFFSET_FROM_PLAYER_X;
         int scroll_y = player_centre_y - SCROLL_OFFSET_FROM_PLAYER_Y;
 
-        int player_oam_x;
         if (scroll_x < 0)
         {
             scroll_x = 0;
-            player_oam_x = player_entity.x;
         }
         else if (scroll_x > SCROLL_MAX_X)
         {
             scroll_x = SCROLL_MAX_X;
-            player_oam_x = player_entity.x - (MAP_WIDTH - SCREEN_WIDTH);
-        }
-        else
-        {
-            player_oam_x = PLAYER_NORMAL_OAM_X;
         }
 
-        int player_oam_y;
         if (scroll_y < 0)
         {
             scroll_y = 0;
-            player_oam_y = player_entity.y;
         }
         else if (scroll_y > SCROLL_MAX_Y)
         {
             scroll_y = SCROLL_MAX_Y;
-            player_oam_y = player_entity.y - (MAP_HEIGHT - SCREEN_HEIGHT);
-        }
-        else
-        {
-            player_oam_y = PLAYER_NORMAL_OAM_Y;
         }
 
         bgSetScroll(bg, scroll_x, scroll_y);
 
-        oamSetXY(&oamMain, 0, player_oam_x, player_oam_y);
+        oamSetXY(&oamMain, 0, player_entity.x - scroll_x, player_entity.y - scroll_y);
         oamSetXY(&oamMain, 1, skeleton_entity.x - scroll_x, skeleton_entity.y - scroll_y);
         oamSetXY(&oamMain, 2, slime_entity.x - scroll_x, slime_entity.y - scroll_y);
 
         UI_PrintToLine(0, "frame_counter = %d", frame_counter);
         UI_PrintToLine(1, "Player pos    = %03d, %03d", (int)player_entity.x, (int)player_entity.y);
         UI_PrintToLine(2, "BG scroll     = %03d, %03d", scroll_x, scroll_y);
-        UI_PrintToLine(3, "OAM pos       = %03d, %03d", player_oam_x, player_oam_y);
 
-        UI_PrintToLine(5, "Skeleton pos  = %03d, %03d", (int)skeleton_entity.x, (int)skeleton_entity.y);
+        UI_PrintToLine(4, "Skeleton pos  = %03d, %03d", (int)skeleton_entity.x, (int)skeleton_entity.y);
 
         frame_counter++;
         UI_PrintDisplayBuffer();
