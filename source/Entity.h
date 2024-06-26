@@ -72,4 +72,16 @@ void EN_ClearStateBit(Entity *entity, int bit);
 /// Gets the `bit`th bit of the state
 int EN_GetStateBit(Entity *entity, int bit);
 
+/// Calculates and returns the x position of the center of the entity.
+int EN_CentreX(Entity *entity);
+
+/// Calculates and returns the y position of the center of the entity.
+int EN_CentreY(Entity *entity);
+
+/// Calculates and returns the x position of the center of the entity.
+float EN_CentreXf(Entity *entity);
+
+/// Calculates and returns the y position of the center of the entity.
+float EN_CentreYf(Entity *entity);
+
 #endif

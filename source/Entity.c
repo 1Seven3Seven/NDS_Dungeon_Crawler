@@ -60,3 +60,11 @@ void EN_SetStateBit(Entity *entity, int bit) { entity->state |= 1 << bit; }
 void EN_ClearStateBit(Entity *entity, int bit) { entity->state &= ~(1 << bit); }
 
 int EN_GetStateBit(Entity *entity, int bit) { return entity->state & (1 << bit); }
+
+int EN_CentreX(Entity *entity) { return entity->x + entity->w / 2; }
+
+int EN_CentreY(Entity *entity) { return entity->y + entity->h / 2; }
+
+float EN_CentreXf(Entity *entity) { return entity->x + (float)entity->w / 2; }
+
+float EN_CentreYf(Entity *entity) { return entity->y + (float)entity->h / 2; }

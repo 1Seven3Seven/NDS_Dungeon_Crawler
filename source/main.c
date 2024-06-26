@@ -23,32 +23,71 @@
 #define SPRITES_PER_ROW 8
 #define ROW_OFFSET SPRITE_SIZE *SPRITES_PER_ROW
 
+#define SCREEN_WIDTH 256
+#define SCREEN_HEIGHT 192
+
+#define MAP_WIDTH 512
+#define MAP_HEIGHT 512
+
+#define PLAYER_WIDTH 11
+#define PLAYER_HEIGHT 15
+
+#define PLAYER_MOVE_SPEED 1
+
+/// Centre of the player at the centre of the map
+#define PLAYER_START_X MAP_WIDTH / 2 - PLAYER_WIDTH / 2
+/// Centre of the player at the centre of the map
+#define PLAYER_START_Y MAP_HEIGHT / 2 - PLAYER_HEIGHT / 2
+
+/// The normal oam x value when the player is not at the map edges (at the centre of the screen)
+#define PLAYER_NORMAL_OAM_X SCREEN_WIDTH / 2 - PLAYER_WIDTH / 2
+/// The normal oam y value when the player is not at the map edges (at the centre of the screen)
+#define PLAYER_NORMAL_OAM_Y SCREEN_HEIGHT / 2 - PLAYER_HEIGHT / 2
+
+/// The maximum x value the player can travel to
+#define PLAYER_MAX_X 512 - PLAYER_WIDTH
+/// The maximum y value the player can travel to
+#define PLAYER_MAX_Y 512 - PLAYER_HEIGHT
+
+/// The offset from the player centre's x position the scroll should be
+#define SCROLL_OFFSET_FROM_PLAYER_X SCREEN_WIDTH / 2
+/// The offset from the player centre's y position the scroll should be
+#define SCROLL_OFFSET_FROM_PLAYER_Y SCREEN_HEIGHT / 2
+
+/// The maximum x scroll value
+#define SCROLL_MAX_X MAP_WIDTH - SCREEN_WIDTH
+/// The maximum y scroll value
+#define SCROLL_MAX_Y MAP_HEIGHT - SCREEN_HEIGHT
+
 void move_player(Entity *player, int keys)
 {
     EN_ClearStateBit(player, EN_MOVING_BIT);
 
     if (keys & KEY_LEFT)
     {
-        player->x -= 1;
+        player->x -= PLAYER_MOVE_SPEED;
         EN_SetStateBit(player, EN_MOVING_BIT);
     }
     if (keys & KEY_RIGHT)
     {
-        player->x += 1;
+        player->x += PLAYER_MOVE_SPEED;
         EN_SetStateBit(player, EN_MOVING_BIT);
     }
     if (keys & KEY_UP)
     {
-        player->y -= 1;
+        player->y -= PLAYER_MOVE_SPEED;
         EN_SetStateBit(player, EN_MOVING_BIT);
     }
     if (keys & KEY_DOWN)
     {
-        player->y += 1;
+        player->y += PLAYER_MOVE_SPEED;
         EN_SetStateBit(player, EN_MOVING_BIT);
     }
 
-    oamSetXY(&oamMain, 0, player->x, player->y);
+    if (player->x < 0) player->x = 0;
+    if (player->x > PLAYER_MAX_X) player->x = PLAYER_MAX_X;
+    if (player->y < 0) player->y = 0;
+    if (player->y > PLAYER_MAX_Y) player->y = PLAYER_MAX_Y;
 }
 
 void animate_player(u16 *player_gfx, int frame_counter, Entity *player_entity)
@@ -118,7 +157,7 @@ int main(void)
     // Loading some graphics
 
     Entity player_entity;
-    EN_Setup(&player_entity, 100, 100, 32, 32, 1, 1);
+    EN_Setup(&player_entity, PLAYER_START_X, PLAYER_START_Y, PLAYER_WIDTH, PLAYER_HEIGHT, 1, 1);
     u16 *player_gfx = oamAllocateGfx(&oamMain, SpriteSize_16x16, SpriteColorFormat_256Color);
     dmaCopy((u8 *)SpriteSheetTiles, player_gfx, SPRITE_SIZE);
 
@@ -128,50 +167,50 @@ int main(void)
     dmaCopy((u8 *)SpriteSheetTiles + ROW_OFFSET, skeleton_gfx, SPRITE_SIZE);
 
     Entity slime_entity;
-    EN_Init(&slime_entity);
+    EN_Setup(&slime_entity, 10, 50, 32, 32, 1, 1);
     u16 *slime_gfx = oamAllocateGfx(&oamMain, SpriteSize_16x16, SpriteColorFormat_256Color);
     dmaCopy((u8 *)SpriteSheetTiles + ROW_OFFSET * 2, slime_gfx, SPRITE_SIZE);
 
     dmaCopy(SpriteSheetPal, SPRITE_PALETTE, SpriteSheetPalLen);
 
     int frame_counter = 0;
-    int scroll_x = 0, scroll_y = 0;
 
-    oamSet(&oamMain,                          // Oam
-           0,                                 // id
-           player_entity.x, player_entity.y,  // x, y
-           0,                                 // priority
-           0,                                 // palette alpha
-           SpriteSize_16x16,                  // sprite size
-           SpriteColorFormat_256Color,        // colour format
-           player_gfx,                        // graphics pointer
-           -1,                                // affine index
-           false,                             // size double
-           false,                             // hide
-           false,                             // h flip
-           false,                             // v flip
-           false                              // mosaic
+    // Initial x and y should not matter as we set the x and y each frame
+    oamSet(&oamMain,                    // Oam
+           0,                           // id
+           0, 0,                        // x, y
+           0,                           // priority
+           0,                           // palette alpha
+           SpriteSize_16x16,            // sprite size
+           SpriteColorFormat_256Color,  // colour format
+           player_gfx,                  // graphics pointer
+           -1,                          // affine index
+           false,                       // size double
+           false,                       // hide
+           false,                       // h flip
+           false,                       // v flip
+           false                        // mosaic
     );
 
-    oamSet(&oamMain,                              // Oam
-           1,                                     // id
-           skeleton_entity.x, skeleton_entity.y,  // x, y
-           0,                                     // priority
-           0,                                     // palette alpha
-           SpriteSize_16x16,                      // sprite size
-           SpriteColorFormat_256Color,            // colour format
-           skeleton_gfx,                          // graphics pointer
-           -1,                                    // affine index
-           false,                                 // size double
-           false,                                 // hide
-           false,                                 // h flip
-           false,                                 // v flip
-           false                                  // mosaic
+    oamSet(&oamMain,                    // Oam
+           1,                           // id
+           0, 0,                        // x, y
+           0,                           // priority
+           0,                           // palette alpha
+           SpriteSize_16x16,            // sprite size
+           SpriteColorFormat_256Color,  // colour format
+           skeleton_gfx,                // graphics pointer
+           -1,                          // affine index
+           false,                       // size double
+           false,                       // hide
+           false,                       // h flip
+           false,                       // v flip
+           false                        // mosaic
     );
 
     oamSet(&oamMain,                    // Oam
            2,                           // id
-           10, 50,                      // x, y
+           0, 0,                        // x, y
            0,                           // priority
            0,                           // palette alpha
            SpriteSize_16x16,            // sprite size
@@ -191,25 +230,64 @@ int main(void)
         scanKeys();
         int keys_held = keysHeld();
 
-        UI_PrintToLine(0, "frame_counter = %d", frame_counter);
-
         move_player(&player_entity, keys_held);
 
-        if (keys_held & KEY_X) scroll_y -= 1;
-        if (keys_held & KEY_B) scroll_y += 1;
-        if (keys_held & KEY_Y) scroll_x -= 1;
-        if (keys_held & KEY_A) scroll_x += 1;
-
-        bgSetScroll(bg, scroll_x, scroll_y);
-
         SK_Update(&skeleton_entity, player_entity);
-        oamSetXY(&oamMain, 1, skeleton_entity.x, skeleton_entity.y);
 
         animate_player(player_gfx, frame_counter, &player_entity);
         animate_skeleton(skeleton_gfx, frame_counter, &skeleton_entity);
         animate_slime(slime_gfx, 0, frame_counter);
 
-        UI_PrintToLine(3, "Scroll = (%03d, %03d)", scroll_x, scroll_y);
+        int player_centre_x = EN_CentreX(&player_entity);
+        int player_centre_y = EN_CentreY(&player_entity);
+
+        int scroll_x = player_centre_x - SCROLL_OFFSET_FROM_PLAYER_X;
+        int scroll_y = player_centre_y - SCROLL_OFFSET_FROM_PLAYER_Y;
+
+        int player_oam_x;
+        if (scroll_x < 0)
+        {
+            scroll_x = 0;
+            player_oam_x = player_entity.x;
+        }
+        else if (scroll_x > SCROLL_MAX_X)
+        {
+            scroll_x = SCROLL_MAX_X;
+            player_oam_x = player_entity.x - (MAP_WIDTH - SCREEN_WIDTH);
+        }
+        else
+        {
+            player_oam_x = PLAYER_NORMAL_OAM_X;
+        }
+
+        int player_oam_y;
+        if (scroll_y < 0)
+        {
+            scroll_y = 0;
+            player_oam_y = player_entity.y;
+        }
+        else if (scroll_y > SCROLL_MAX_Y)
+        {
+            scroll_y = SCROLL_MAX_Y;
+            player_oam_y = player_entity.y - (MAP_HEIGHT - SCREEN_HEIGHT);
+        }
+        else
+        {
+            player_oam_y = PLAYER_NORMAL_OAM_Y;
+        }
+
+        bgSetScroll(bg, scroll_x, scroll_y);
+
+        oamSetXY(&oamMain, 0, player_oam_x, player_oam_y);
+        oamSetXY(&oamMain, 1, skeleton_entity.x - scroll_x, skeleton_entity.y - scroll_y);
+        oamSetXY(&oamMain, 2, slime_entity.x - scroll_x, slime_entity.y - scroll_y);
+
+        UI_PrintToLine(0, "frame_counter = %d", frame_counter);
+        UI_PrintToLine(1, "Player pos    = %03d, %03d", (int)player_entity.x, (int)player_entity.y);
+        UI_PrintToLine(2, "BG scroll     = %03d, %03d", scroll_x, scroll_y);
+        UI_PrintToLine(3, "OAM pos       = %03d, %03d", player_oam_x, player_oam_y);
+
+        UI_PrintToLine(5, "Skeleton pos  = %03d, %03d", (int)skeleton_entity.x, (int)skeleton_entity.y);
 
         frame_counter++;
         UI_PrintDisplayBuffer();
