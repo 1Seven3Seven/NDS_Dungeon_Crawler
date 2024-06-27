@@ -1,5 +1,5 @@
-#ifndef NDS_DUNGEON_CRAWLER_H
-#define NDS_DUNGEON_CRAWLER_H
+#ifndef NDS_DUNGEON_CRAWLER_GFX_H
+#define NDS_DUNGEON_CRAWLER_GFX_H
 
 #include "BasicBackground.h"
 #include "SpriteSheet.h"
