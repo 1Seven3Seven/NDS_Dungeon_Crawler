@@ -166,7 +166,7 @@ void set_oam_positions(Entity entities[], int array_len, int offset_x, int offse
     }
 }
 
-void centre_on_entity(Entity entities[], int centre_index, int bg_ids[], int bg_ids_len)
+void centre_on_entity(Entity entities[], int entities_len, int centre_index, int bg_ids[], int bg_ids_len)
 {
     int scroll_x = EN_CentreX(&entities[centre_index]) - SCROLL_OFFSET_FROM_ENTITY_CENTRE_X;
     int scroll_y = EN_CentreY(&entities[centre_index]) - SCROLL_OFFSET_FROM_ENTITY_CENTRE_Y;
@@ -194,7 +194,7 @@ void centre_on_entity(Entity entities[], int centre_index, int bg_ids[], int bg_
         bgSetScroll(bg_ids[i], scroll_x, scroll_y);
     }
 
-    set_oam_positions(entities, NUM_ENTITIES, scroll_x, scroll_y);
+    set_oam_positions(entities, entities_len, scroll_x, scroll_y);
 }
 
 void display_entity_position(int line_number, const char *prepend, Entity *entity)
@@ -320,7 +320,7 @@ int main(void)
             if (centre_entity_index >= NUM_ENTITIES) centre_entity_index = 0;
         }
 
-        centre_on_entity(entities, centre_entity_index, bg_ids, 1);
+        centre_on_entity(entities, NUM_ENTITIES, centre_entity_index, bg_ids, 1);
 
         UI_PrintToLine(0, "frame_counter = %d", frame_counter);
         display_entity_position(1, "Player pos   = ", &entities[PLAYER_INDEX]);
