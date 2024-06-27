@@ -32,9 +32,6 @@ typedef struct _Entity
     /// Lowest bit set means alive
     u8 state;
 
-    /// Some states take time, so this can be used to track that
-    u8 state_counter;
-
 } Entity;
 
 /// Sets up the entity to a default, dead, state.
