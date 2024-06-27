@@ -127,20 +127,20 @@ void animate_skeleton(u16 *skeleton_gfx, int frame_counter, Entity *skeleton_ent
             SPRITE_SIZE);
 }
 
-void animate_slime(u16 *slime_gfx, int moving, int frame_counter)
+void animate_slime(u16 *slime_gfx, int frame_counter, Entity *slime_entity)
 {
-    if (moving)
+    if (EN_GetStateBit(slime_entity, EN_MOVING_BIT))
     {
-        dmaCopy((u8 *)SpriteSheetTiles + ROW_OFFSET * 2 + SPRITE_SIZE * (2 + (frame_counter / 10) % 2),  //
-                slime_gfx,                                                                               //
-                SPRITE_SIZE);
+        slime_entity->animation_frame_number = 2 + (frame_counter / 10) % 2;
     }
     else
     {
-        dmaCopy((u8 *)SpriteSheetTiles + ROW_OFFSET * 2 + SPRITE_SIZE * ((frame_counter / 30) % 2),  //
-                slime_gfx,                                                                           //
-                SPRITE_SIZE);
+        slime_entity->animation_frame_number = (frame_counter / 30) % 2;
     }
+
+    dmaCopy((u8 *)SpriteSheetTiles + ROW_OFFSET * 2 + SPRITE_SIZE * slime_entity->animation_frame_number,  //
+            slime_gfx,                                                                                     //
+            SPRITE_SIZE);
 }
 
 void hide_if_not_on_screen(Entity *entity, int oam_id, int offset_x, int offset_y)
@@ -307,7 +307,7 @@ int main(void)
 
         animate_player(player_gfx, frame_counter, &entities[PLAYER_INDEX]);
         animate_skeleton(skeleton_gfx, frame_counter, &entities[SKELETON_INDEX]);
-        animate_slime(slime_gfx, 0, frame_counter);
+        animate_slime(slime_gfx, frame_counter, &entities[SLIME_INDEX]);
 
         if (keys_down & KEY_L)
         {
