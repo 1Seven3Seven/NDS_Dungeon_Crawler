@@ -8,6 +8,9 @@
 
 extern char UI_DisplayBuffer[UI_NUM_LINES][UI_NUM_CHARS + 1];
 
+// Return true if the given line number is incorrect
+inline int UI_LineNumIncorrect(int line_number) { return line_number < 0 || line_number >= UI_NUM_LINES; }
+
 // Clears the given line in the display buffer.
 void UI_ClearLine(int line_number);
 

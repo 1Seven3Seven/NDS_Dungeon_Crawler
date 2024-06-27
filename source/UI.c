@@ -12,10 +12,7 @@ char UI_DisplayBuffer[UI_NUM_LINES][UI_NUM_CHARS + 1];
 
 void UI_ClearLine(int line_number)
 {
-    if (line_number < 0 || line_number >= UI_NUM_LINES)
-    {
-        return;
-    }
+    if (UI_LineNumIncorrect(line_number)) return;
 
     memset(UI_DisplayBuffer[line_number], ' ', UI_NUM_CHARS);
     UI_DisplayBuffer[line_number][UI_NUM_CHARS] = '\0';
@@ -40,10 +37,7 @@ void UI_PrintDisplayBuffer()
 
 void UI_RemoveNullsFromLine(int line_number)
 {
-    if (line_number < 0 || line_number >= UI_NUM_LINES)
-    {
-        return;
-    }
+    if (UI_LineNumIncorrect(line_number)) return;
 
     for (int i = 0; i < UI_NUM_CHARS; i++)
     {
@@ -56,10 +50,7 @@ void UI_RemoveNullsFromLine(int line_number)
 
 void UI_PrintToLine(int line_number, const char *fmt, ...)
 {
-    if (line_number < 0 || line_number >= UI_NUM_LINES)
-    {
-        return;
-    }
+    if (UI_LineNumIncorrect(line_number)) return;
 
     UI_ClearLine(line_number);
 
@@ -73,10 +64,7 @@ void UI_PrintToLine(int line_number, const char *fmt, ...)
 
 void UI_PrintU16Bits(int line_number, u16 some_u16)
 {
-    if (line_number < 0 || line_number >= UI_NUM_LINES)
-    {
-        return;
-    }
+    if (UI_LineNumIncorrect(line_number)) return;
 
     UI_ClearLine(line_number);
 
@@ -89,10 +77,7 @@ void UI_PrintU16Bits(int line_number, u16 some_u16)
 
 void UI_PrintU32Bits(int line_number, u32 some_u32)
 {
-    if (line_number < 0 || line_number >= UI_NUM_LINES)
-    {
-        return;
-    }
+    if (UI_LineNumIncorrect(line_number)) return;
 
     UI_ClearLine(line_number);
 
