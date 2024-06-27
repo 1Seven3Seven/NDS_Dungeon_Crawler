@@ -1,9 +1,9 @@
 #include "Skeleton.h"
 
-void SK_Update(Entity *skeleton, Entity player)
+void SK_Update(Entity *skeleton, Entity *player)
 {
-    float x_diff = player.x - skeleton->x;
-    float y_diff = player.y - skeleton->y;
+    float x_diff = player->x - skeleton->x;
+    float y_diff = player->y - skeleton->y;
 
     if ((abs(x_diff) + abs(y_diff)) < 32)
     {
