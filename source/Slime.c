@@ -4,6 +4,8 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 
+#include "GFX.h"
+
 void SL_SetupSlime(Entity *slime, int x, int y)
 {
     EN_Setup(slime, x, y, SL_WIDTH, SL_HEIGHT, SL_MAX_HEALTH, SL_ATTACK_DELAY);
@@ -16,25 +18,14 @@ void SL_SetupSlimeState(SlimeState *slime_state)
 
 void SL_Update(Entity *slime, SlimeState *slime_state, Entity *player)
 {
+    // Wait till we can move
     if (slime->current_attack_delay > 0)
     {
         slime->current_attack_delay--;
         return;
     }
 
-    // If the slime has stopped moving, then start the attack delay
-    // State that the slime should reset its direction
-    if (slime_state->velocity == 0)
-    {
-        slime->current_attack_delay = slime->attack_delay;
-        slime_state->velocity = -1;
-
-        // We are no longer moving
-        EN_ClearStateBit(slime, EN_MOVING_BIT);
-        return;
-    }
-
-    // The velocity is unset, so get a direction to jump in
+    // We can move, so chose a direction if not moving
     if (slime_state->velocity == -1)
     {
         slime_state->velocity = SL_INITIAL_VELOCITY;
@@ -45,10 +36,11 @@ void SL_Update(Entity *slime, SlimeState *slime_state, Entity *player)
         float diff_x_squared = diff_x * diff_x;
         float diff_y_squared = diff_y * diff_y;
 
+        // Jump at the player if close enough else random
         float direction;
         if (diff_x_squared + diff_y_squared < SL_MAX_DISTANCE_ATTACK_PLAYER_SQUARED)
         {
-            direction = atan2f(diff_y, diff_x);
+            direction = -atan2f(diff_y, diff_x);
         }
         else
         {
@@ -62,6 +54,20 @@ void SL_Update(Entity *slime, SlimeState *slime_state, Entity *player)
         EN_SetStateBit(slime, EN_MOVING_BIT);
     }
 
+    if (slime_state->velocity == 0)
+    {
+        // We have finished moving
+        EN_ClearStateBit(slime, EN_MOVING_BIT);
+
+        // Start the cooldown
+        slime->current_attack_delay = slime->attack_delay;
+
+        // So we can choose the direction when cooldown is off
+        slime_state->velocity = -1;
+
+        return;
+    }
+
     s16 velocity_10 = slime_state->velocity / 10;
 
     // Move in the direction
@@ -70,4 +76,20 @@ void SL_Update(Entity *slime, SlimeState *slime_state, Entity *player)
 
     // Reduce the velocity
     slime_state->velocity--;
+}
+
+void SL_Animate(Entity *slime, u16 *slime_gfx, int frame_counter)
+{
+    if (EN_GetStateBit(slime, EN_MOVING_BIT))
+    {
+        slime->animation_frame_number = 2 + (frame_counter / 7) % 2;
+    }
+    else
+    {
+        slime->animation_frame_number = (frame_counter / 30) % 2;
+    }
+
+    dmaCopy((u8 *)SpriteSheetTiles + ROW_OFFSET * 2 + SPRITE_SIZE * slime->animation_frame_number,  //
+            slime_gfx,                                                                              //
+            SPRITE_SIZE);
 }

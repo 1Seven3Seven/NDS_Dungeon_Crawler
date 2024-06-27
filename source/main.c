@@ -9,20 +9,13 @@
 #include <stdio.h>
 #include <string.h>
 
-// Spritesheet
-#include "BasicBackground.h"
-#include "SpriteSheet.h"
-
 // My libraries
 #include "Entity.h"
+#include "GFX.h"  // Includes the sprite sheet and backgrounds
 #include "Skeleton.h"
 #include "Slime.h"
 #include "SpriteDrawing.h"
 #include "UI.h"
-
-#define SPRITE_SIZE 16 * 16
-#define SPRITES_PER_ROW 8
-#define ROW_OFFSET SPRITE_SIZE *SPRITES_PER_ROW
 
 #define SCREEN_WIDTH 256
 #define SCREEN_HEIGHT 192
@@ -125,22 +118,6 @@ void animate_skeleton(u16 *skeleton_gfx, int frame_counter, Entity *skeleton_ent
 
     dmaCopy((u8 *)SpriteSheetTiles + ROW_OFFSET + SPRITE_SIZE * skeleton_entity->animation_frame_number,  //
             skeleton_gfx,                                                                                 //
-            SPRITE_SIZE);
-}
-
-void animate_slime(u16 *slime_gfx, int frame_counter, Entity *slime_entity)
-{
-    if (EN_GetStateBit(slime_entity, EN_MOVING_BIT))
-    {
-        slime_entity->animation_frame_number = 2 + (frame_counter / 10) % 2;
-    }
-    else
-    {
-        slime_entity->animation_frame_number = (frame_counter / 30) % 2;
-    }
-
-    dmaCopy((u8 *)SpriteSheetTiles + ROW_OFFSET * 2 + SPRITE_SIZE * slime_entity->animation_frame_number,  //
-            slime_gfx,                                                                                     //
             SPRITE_SIZE);
 }
 
@@ -316,7 +293,7 @@ int main(void)
 
         animate_player(player_gfx, frame_counter, &entities[PLAYER_INDEX]);
         animate_skeleton(skeleton_gfx, frame_counter, &entities[SKELETON_INDEX]);
-        animate_slime(slime_gfx, frame_counter, &entities[SLIME_INDEX]);
+        SL_Animate(&entities[SLIME_INDEX], slime_gfx, frame_counter);
 
         if (keys_down & KEY_L)
         {
@@ -335,10 +312,6 @@ int main(void)
         display_entity_position(1, "Player pos   = ", &entities[PLAYER_INDEX]);
         display_entity_position(2, "Skeleton pos = ", &entities[SKELETON_INDEX]);
         display_entity_position(3, "Slime pos    = ", &entities[SLIME_INDEX]);
-
-        UI_PrintToLine(5, "Slime Info:");
-        UI_PrintToLine(6, "  attack delay = %d", entities[SLIME_INDEX].current_attack_delay);
-        UI_PrintToLine(7, "  velocity     = %d", slime_state.velocity);
 
         frame_counter++;
         UI_PrintDisplayBuffer();

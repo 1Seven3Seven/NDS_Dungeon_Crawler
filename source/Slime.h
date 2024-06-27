@@ -1,10 +1,12 @@
 #ifndef DUNGEON_CRAWLER_SLIME_H
 #define DUNGEON_CRAWLER_SLIME_H
 
+#include <nds.h>
+
 #include "Entity.h"
 
-#define SL_WIDTH 32
-#define SL_HEIGHT 32
+#define SL_WIDTH 14
+#define SL_HEIGHT 8
 
 #define SL_MAX_HEALTH 10
 #define SL_ATTACK_DELAY 60
@@ -12,7 +14,7 @@
 #define SL_INITIAL_VELOCITY 30
 #define SL_VELOCITY_REDUCTION 0.1
 
-#define SL_MAX_DISTANCE_ATTACK_PLAYER_SQUARED 100 * 100
+#define SL_MAX_DISTANCE_ATTACK_PLAYER_SQUARED 72 * 72
 
 typedef struct _SlimeState
 {
@@ -35,5 +37,8 @@ void SL_SetupSlimeState(SlimeState *slime_state);
 For slimes, the movement counts as an attack
 */
 void SL_Update(Entity *slime, SlimeState *slime_state, Entity *player);
+
+/// Animates the slime by modifying its graphics
+void SL_Animate(Entity *slime, u16 *slime_gfx, int frame_counter);
 
 #endif
