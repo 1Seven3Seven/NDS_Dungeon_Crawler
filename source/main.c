@@ -16,6 +16,7 @@
 // My libraries
 #include "Entity.h"
 #include "Skeleton.h"
+#include "Slime.h"
 #include "SpriteDrawing.h"
 #include "UI.h"
 
@@ -238,9 +239,16 @@ int main(void)
     Entity entities[NUM_ENTITIES];
     EN_InitArray(entities, NUM_ENTITIES);
 
+    // The player
     EN_Setup(&entities[PLAYER_INDEX], PLAYER_START_X, PLAYER_START_Y, PLAYER_WIDTH, PLAYER_HEIGHT, 1, 1);
+
+    // The skeleton
     EN_Setup(&entities[SKELETON_INDEX], 10, 10, 32, 32, 1, 1);
-    EN_Setup(&entities[SLIME_INDEX], 10, 50, 32, 32, 1, 1);
+
+    // The slime
+    SL_SetupSlime(&entities[SLIME_INDEX], 250, 200);
+    SlimeState slime_state;
+    SL_SetupSlimeState(&slime_state);
 
     int frame_counter = 0;
     int centre_entity_index = PLAYER_INDEX;
@@ -303,7 +311,8 @@ int main(void)
 
         move_player(&entities[PLAYER_INDEX], keys_held);
 
-        SK_Update(&entities[SKELETON_INDEX], entities[PLAYER_INDEX]);
+        SK_Update(&entities[SKELETON_INDEX], &entities[PLAYER_INDEX]);
+        SL_Update(&entities[SLIME_INDEX], &slime_state, &entities[PLAYER_INDEX]);
 
         animate_player(player_gfx, frame_counter, &entities[PLAYER_INDEX]);
         animate_skeleton(skeleton_gfx, frame_counter, &entities[SKELETON_INDEX]);
@@ -325,6 +334,11 @@ int main(void)
         UI_PrintToLine(0, "frame_counter = %d", frame_counter);
         display_entity_position(1, "Player pos   = ", &entities[PLAYER_INDEX]);
         display_entity_position(2, "Skeleton pos = ", &entities[SKELETON_INDEX]);
+        display_entity_position(3, "Slime pos    = ", &entities[SLIME_INDEX]);
+
+        UI_PrintToLine(5, "Slime Info:");
+        UI_PrintToLine(6, "  attack delay = %d", entities[SLIME_INDEX].current_attack_delay);
+        UI_PrintToLine(7, "  velocity     = %d", slime_state.velocity);
 
         frame_counter++;
         UI_PrintDisplayBuffer();
