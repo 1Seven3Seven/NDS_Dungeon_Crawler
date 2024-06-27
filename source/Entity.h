@@ -81,4 +81,28 @@ float EN_CentreXf(Entity *entity);
 /// Calculates and returns the y position of the center of the entity.
 float EN_CentreYf(Entity *entity);
 
+/// Returns the x value of the left of the entity.
+int EN_Left(Entity *entity);
+
+/// Returns the x value of the right of the entity.
+int EN_Right(Entity *entity);
+
+/// Returns the y value of the top of the entity.
+int EN_Top(Entity *entity);
+
+/// Returns the y value of the bottom of the entity.
+int EN_Bottom(Entity *entity);
+
+/// Returns the x value of the left of the entity.
+int EN_Leftf(Entity *entity);
+
+/// Returns the x value of the right of the entity.
+int EN_Rightf(Entity *entity);
+
+/// Returns the y value of the top of the entity.
+int EN_Topf(Entity *entity);
+
+/// Returns the y value of the bottom of the entity.
+int EN_Bottomf(Entity *entity);
+
 #endif

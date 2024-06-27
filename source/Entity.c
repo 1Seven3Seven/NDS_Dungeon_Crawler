@@ -67,3 +67,19 @@ int EN_CentreY(Entity *entity) { return entity->y + entity->h / 2; }
 float EN_CentreXf(Entity *entity) { return entity->x + (float)entity->w / 2; }
 
 float EN_CentreYf(Entity *entity) { return entity->y + (float)entity->h / 2; }
+
+int EN_Left(Entity *entity) { return entity->x; }
+
+int EN_Right(Entity *entity) { return entity->x + entity->w; }
+
+int EN_Top(Entity *entity) { return entity->y; }
+
+int EN_Bottom(Entity *entity) { return entity->y + entity->h; }
+
+int EN_Leftf(Entity *entity) { return entity->x; }
+
+int EN_Rightf(Entity *entity) { return entity->x + entity->w; }
+
+int EN_Topf(Entity *entity) { return entity->y; }
+
+int EN_Bottomf(Entity *entity) { return entity->y + entity->h; }
