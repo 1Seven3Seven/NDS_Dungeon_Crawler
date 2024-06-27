@@ -50,14 +50,21 @@
 #define PLAYER_MAX_Y 512 - PLAYER_HEIGHT
 
 /// The offset from the player centre's x position the scroll should be
-#define SCROLL_OFFSET_FROM_PLAYER_X SCREEN_WIDTH / 2
+#define SCROLL_OFFSET_FROM_ENTITY_CENTRE_X SCREEN_WIDTH / 2
 /// The offset from the player centre's y position the scroll should be
-#define SCROLL_OFFSET_FROM_PLAYER_Y SCREEN_HEIGHT / 2
+#define SCROLL_OFFSET_FROM_ENTITY_CENTRE_Y SCREEN_HEIGHT / 2
 
 /// The maximum x scroll value
 #define SCROLL_MAX_X MAP_WIDTH - SCREEN_WIDTH
 /// The maximum y scroll value
 #define SCROLL_MAX_Y MAP_HEIGHT - SCREEN_HEIGHT
+
+/// The number of entities that are being used in this demo
+#define NUM_ENTITIES 3
+
+#define PLAYER_INDEX 0
+#define SKELETON_INDEX 1
+#define SLIME_INDEX 2
 
 void move_player(Entity *player, int keys)
 {
@@ -136,6 +143,60 @@ void animate_slime(u16 *slime_gfx, int moving, int frame_counter)
     }
 }
 
+void hide_if_not_on_screen(Entity *entity, int oam_id, int offset_x, int offset_y)
+{
+    if (entity->x > SCREEN_WIDTH + offset_x)
+        oamSetHidden(&oamMain, oam_id, true);
+    else if (entity->x + entity->w < offset_x)
+        oamSetHidden(&oamMain, oam_id, true);
+    else if (entity->y > SCREEN_HEIGHT + offset_y)
+        oamSetHidden(&oamMain, oam_id, true);
+    else if (entity->y + entity->h < offset_y)
+        oamSetHidden(&oamMain, oam_id, true);
+    else
+        oamSetHidden(&oamMain, oam_id, false);
+}
+
+void set_oam_positions(Entity entities[], int array_len, int offset_x, int offset_y)
+{
+    for (int i = 0; i < array_len; i++)
+    {
+        hide_if_not_on_screen(&entities[i], i, offset_x, offset_y);
+        oamSetXY(&oamMain, i, entities[i].x - offset_x, entities[i].y - offset_y);
+    }
+}
+
+void centre_on_entity(Entity entities[], int centre_index, int bg_ids[], int bg_ids_len)
+{
+    int scroll_x = EN_CentreX(&entities[centre_index]) - SCROLL_OFFSET_FROM_ENTITY_CENTRE_X;
+    int scroll_y = EN_CentreY(&entities[centre_index]) - SCROLL_OFFSET_FROM_ENTITY_CENTRE_Y;
+
+    if (scroll_x < 0)
+    {
+        scroll_x = 0;
+    }
+    else if (scroll_x > SCROLL_MAX_X)
+    {
+        scroll_x = SCROLL_MAX_X;
+    }
+
+    if (scroll_y < 0)
+    {
+        scroll_y = 0;
+    }
+    else if (scroll_y > SCROLL_MAX_Y)
+    {
+        scroll_y = SCROLL_MAX_Y;
+    }
+
+    for (int i = 0; i < bg_ids_len; i++)
+    {
+        bgSetScroll(bg_ids[i], scroll_x, scroll_y);
+    }
+
+    set_oam_positions(entities, NUM_ENTITIES, scroll_x, scroll_y);
+}
+
 int main(void)
 {
     // Setting up the top screen for sprites
@@ -149,31 +210,35 @@ int main(void)
     UI_ResetDisplayBuffer();
 
     // Background
-    int bg = bgInit(0, BgType_Text8bpp, BgSize_T_512x512, 0, 1);
+    int bg_ids[1];
+    bg_ids[0] = bgInit(0, BgType_Text8bpp, BgSize_T_512x512, 0, 1);
     dmaCopy(BasicBackgroundTiles, BG_TILE_RAM(1), BasicBackgroundTilesLen);
     dmaCopy(BasicBackgroundMap, BG_MAP_RAM(0), BasicBackgroundMapLen);
     dmaCopy(BasicBackgroundPal, BG_PALETTE, BasicBackgroundPalLen);
 
     // Loading some graphics
 
-    Entity player_entity;
-    EN_Setup(&player_entity, PLAYER_START_X, PLAYER_START_Y, PLAYER_WIDTH, PLAYER_HEIGHT, 1, 1);
     u16 *player_gfx = oamAllocateGfx(&oamMain, SpriteSize_16x16, SpriteColorFormat_256Color);
     dmaCopy((u8 *)SpriteSheetTiles, player_gfx, SPRITE_SIZE);
 
-    Entity skeleton_entity;
-    EN_Setup(&skeleton_entity, 10, 10, 32, 32, 1, 1);
     u16 *skeleton_gfx = oamAllocateGfx(&oamMain, SpriteSize_16x16, SpriteColorFormat_256Color);
     dmaCopy((u8 *)SpriteSheetTiles + ROW_OFFSET, skeleton_gfx, SPRITE_SIZE);
 
-    Entity slime_entity;
-    EN_Setup(&slime_entity, 10, 50, 32, 32, 1, 1);
     u16 *slime_gfx = oamAllocateGfx(&oamMain, SpriteSize_16x16, SpriteColorFormat_256Color);
     dmaCopy((u8 *)SpriteSheetTiles + ROW_OFFSET * 2, slime_gfx, SPRITE_SIZE);
 
     dmaCopy(SpriteSheetPal, SPRITE_PALETTE, SpriteSheetPalLen);
 
+    // Setting up some entites
+    Entity entities[NUM_ENTITIES];
+    EN_InitArray(entities, NUM_ENTITIES);
+
+    EN_Setup(&entities[PLAYER_INDEX], PLAYER_START_X, PLAYER_START_Y, PLAYER_WIDTH, PLAYER_HEIGHT, 1, 1);
+    EN_Setup(&entities[SKELETON_INDEX], 10, 10, 32, 32, 1, 1);
+    EN_Setup(&entities[SLIME_INDEX], 10, 50, 32, 32, 1, 1);
+
     int frame_counter = 0;
+    int centre_entity_index = PLAYER_INDEX;
 
     // Initial x and y should not matter as we set the x and y each frame
     oamSet(&oamMain,                    // Oam
@@ -229,50 +294,36 @@ int main(void)
         consoleClear();
         scanKeys();
         int keys_held = keysHeld();
+        int keys_down = keysDown();
 
-        move_player(&player_entity, keys_held);
+        move_player(&entities[PLAYER_INDEX], keys_held);
 
-        SK_Update(&skeleton_entity, player_entity);
+        SK_Update(&entities[SKELETON_INDEX], entities[PLAYER_INDEX]);
 
-        animate_player(player_gfx, frame_counter, &player_entity);
-        animate_skeleton(skeleton_gfx, frame_counter, &skeleton_entity);
+        animate_player(player_gfx, frame_counter, &entities[PLAYER_INDEX]);
+        animate_skeleton(skeleton_gfx, frame_counter, &entities[SKELETON_INDEX]);
         animate_slime(slime_gfx, 0, frame_counter);
 
-        int player_centre_x = EN_CentreX(&player_entity);
-        int player_centre_y = EN_CentreY(&player_entity);
-
-        int scroll_x = player_centre_x - SCROLL_OFFSET_FROM_PLAYER_X;
-        int scroll_y = player_centre_y - SCROLL_OFFSET_FROM_PLAYER_Y;
-
-        if (scroll_x < 0)
+        if (keys_down & KEY_L)
         {
-            scroll_x = 0;
+            centre_entity_index--;
+            if (centre_entity_index < 0) centre_entity_index = NUM_ENTITIES - 1;
         }
-        else if (scroll_x > SCROLL_MAX_X)
+        if (keys_down & KEY_R)
         {
-            scroll_x = SCROLL_MAX_X;
+            centre_entity_index++;
+            if (centre_entity_index >= NUM_ENTITIES) centre_entity_index = 0;
         }
 
-        if (scroll_y < 0)
-        {
-            scroll_y = 0;
-        }
-        else if (scroll_y > SCROLL_MAX_Y)
-        {
-            scroll_y = SCROLL_MAX_Y;
-        }
-
-        bgSetScroll(bg, scroll_x, scroll_y);
-
-        oamSetXY(&oamMain, 0, player_entity.x - scroll_x, player_entity.y - scroll_y);
-        oamSetXY(&oamMain, 1, skeleton_entity.x - scroll_x, skeleton_entity.y - scroll_y);
-        oamSetXY(&oamMain, 2, slime_entity.x - scroll_x, slime_entity.y - scroll_y);
+        centre_on_entity(entities, centre_entity_index, bg_ids, 1);
 
         UI_PrintToLine(0, "frame_counter = %d", frame_counter);
-        UI_PrintToLine(1, "Player pos    = %03d, %03d", (int)player_entity.x, (int)player_entity.y);
-        UI_PrintToLine(2, "BG scroll     = %03d, %03d", scroll_x, scroll_y);
-
-        UI_PrintToLine(4, "Skeleton pos  = %03d, %03d", (int)skeleton_entity.x, (int)skeleton_entity.y);
+        UI_PrintToLine(1, "Player pos    = %03d, %03d",  //
+                       (int)entities[PLAYER_INDEX].x,    //
+                       (int)entities[PLAYER_INDEX].y);
+        UI_PrintToLine(3, "Skeleton pos  = %03d, %03d",  //
+                       (int)entities[SKELETON_INDEX].x,  //
+                       (int)entities[SKELETON_INDEX].y);
 
         frame_counter++;
         UI_PrintDisplayBuffer();
