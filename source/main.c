@@ -197,6 +197,11 @@ void centre_on_entity(Entity entities[], int centre_index, int bg_ids[], int bg_
     set_oam_positions(entities, NUM_ENTITIES, scroll_x, scroll_y);
 }
 
+void display_entity_position(int line_number, const char *prepend, Entity *entity)
+{
+    UI_PrintToLine(line_number, "%s%03d, %03d", prepend, (int)entity->x, (int)entity->y);
+}
+
 int main(void)
 {
     // Setting up the top screen for sprites
@@ -318,12 +323,8 @@ int main(void)
         centre_on_entity(entities, centre_entity_index, bg_ids, 1);
 
         UI_PrintToLine(0, "frame_counter = %d", frame_counter);
-        UI_PrintToLine(1, "Player pos    = %03d, %03d",  //
-                       (int)entities[PLAYER_INDEX].x,    //
-                       (int)entities[PLAYER_INDEX].y);
-        UI_PrintToLine(3, "Skeleton pos  = %03d, %03d",  //
-                       (int)entities[SKELETON_INDEX].x,  //
-                       (int)entities[SKELETON_INDEX].y);
+        display_entity_position(1, "Player pos   = ", &entities[PLAYER_INDEX]);
+        display_entity_position(2, "Skeleton pos = ", &entities[SKELETON_INDEX]);
 
         frame_counter++;
         UI_PrintDisplayBuffer();
