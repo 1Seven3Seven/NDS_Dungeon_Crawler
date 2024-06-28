@@ -12,6 +12,8 @@
 // My libraries
 #include "Entity.h"
 #include "GFX.h"  // Includes the sprite sheet and backgrounds
+#include "Map.h"
+#include "Player.h"
 #include "Skeleton.h"
 #include "Slime.h"
 #include "SpriteDrawing.h"
@@ -22,9 +24,6 @@
 #define SCREEN_WIDTH 256
 #define SCREEN_HEIGHT 192
 
-#define MAP_WIDTH 512
-#define MAP_HEIGHT 512
-
 #define PLAYER_WIDTH 11
 #define PLAYER_HEIGHT 15
 
@@ -34,16 +33,6 @@
 #define PLAYER_START_X MAP_WIDTH / 2 - PLAYER_WIDTH / 2
 /// Centre of the player at the centre of the map
 #define PLAYER_START_Y MAP_HEIGHT / 2 - PLAYER_HEIGHT / 2
-
-/// The normal oam x value when the player is not at the map edges (at the centre of the screen)
-#define PLAYER_NORMAL_OAM_X SCREEN_WIDTH / 2 - PLAYER_WIDTH / 2
-/// The normal oam y value when the player is not at the map edges (at the centre of the screen)
-#define PLAYER_NORMAL_OAM_Y SCREEN_HEIGHT / 2 - PLAYER_HEIGHT / 2
-
-/// The maximum x value the player can travel to
-#define PLAYER_MAX_X 512 - PLAYER_WIDTH
-/// The maximum y value the player can travel to
-#define PLAYER_MAX_Y 512 - PLAYER_HEIGHT
 
 /// The offset from the player centre's x position the scroll should be
 #define SCROLL_OFFSET_FROM_ENTITY_CENTRE_X SCREEN_WIDTH / 2
@@ -61,51 +50,6 @@
 #define PLAYER_INDEX 0
 #define SKELETON_INDEX 1
 #define SLIME_INDEX 2
-
-void move_player(Entity *player, int keys)
-{
-    EN_ClearStateBit(player, EN_MOVING_BIT);
-
-    if (keys & KEY_LEFT)
-    {
-        player->x -= PLAYER_MOVE_SPEED;
-        EN_SetStateBit(player, EN_MOVING_BIT);
-    }
-    if (keys & KEY_RIGHT)
-    {
-        player->x += PLAYER_MOVE_SPEED;
-        EN_SetStateBit(player, EN_MOVING_BIT);
-    }
-    if (keys & KEY_UP)
-    {
-        player->y -= PLAYER_MOVE_SPEED;
-        EN_SetStateBit(player, EN_MOVING_BIT);
-    }
-    if (keys & KEY_DOWN)
-    {
-        player->y += PLAYER_MOVE_SPEED;
-        EN_SetStateBit(player, EN_MOVING_BIT);
-    }
-
-    if (player->x < 0) player->x = 0;
-    if (player->x > PLAYER_MAX_X) player->x = PLAYER_MAX_X;
-    if (player->y < 0) player->y = 0;
-    if (player->y > PLAYER_MAX_Y) player->y = PLAYER_MAX_Y;
-}
-
-void animate_player(u16 *player_gfx, int frame_counter, Entity *player_entity)
-{
-    if (EN_GetStateBit(player_entity, EN_MOVING_BIT))
-    {
-        player_entity->animation_frame_number = 2 + (frame_counter / 10) % 2;
-    }
-    else
-    {
-        player_entity->animation_frame_number = (frame_counter / 30) % 2;
-    }
-
-    dmaCopy((u8 *)SpriteSheetTiles + SPRITE_SIZE * player_entity->animation_frame_number, player_gfx, SPRITE_SIZE);
-}
 
 void animate_skeleton(u16 *skeleton_gfx, int frame_counter, Entity *skeleton_entity)
 {
@@ -274,7 +218,7 @@ int main(void)
     EN_InitArray(entities, NUM_ENTITIES);
 
     // The player
-    EN_Setup(&entities[PLAYER_INDEX], PLAYER_START_X, PLAYER_START_Y, PLAYER_WIDTH, PLAYER_HEIGHT, 1, 30);
+    PL_SetupPlayer(&entities[PLAYER_INDEX], PLAYER_START_X, PLAYER_START_Y);
 
     // The skeleton
     EN_Setup(&entities[SKELETON_INDEX], 10, 10, 32, 32, 1, 1);
@@ -374,10 +318,10 @@ int main(void)
     {
         consoleClear();
         scanKeys();
-        int keys_held = keysHeld();
-        int keys_down = keysDown();
+        uint32 keys_held = keysHeld();
+        uint32 keys_down = keysDown();
 
-        move_player(&entities[PLAYER_INDEX], keys_held);
+        PL_Move(&entities[PLAYER_INDEX], keys_held);
 
         // Get a vector in the direction the player is moving
         if (!attack_counter)
@@ -457,7 +401,7 @@ int main(void)
         SK_Update(&entities[SKELETON_INDEX], &entities[PLAYER_INDEX]);
         SL_Update(&entities[SLIME_INDEX], &slime_state, &entities[PLAYER_INDEX]);
 
-        animate_player(player_gfx, frame_counter, &entities[PLAYER_INDEX]);
+        PL_Animate(&entities[PLAYER_INDEX], player_gfx, frame_counter);
         animate_skeleton(skeleton_gfx, frame_counter, &entities[SKELETON_INDEX]);
         SL_Animate(&entities[SLIME_INDEX], slime_gfx, frame_counter);
 
