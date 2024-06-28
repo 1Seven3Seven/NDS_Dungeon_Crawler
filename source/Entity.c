@@ -28,7 +28,7 @@ void EN_Setup(Entity *entity, int x, int y, u8 w, u8 h, u16 max_health, u8 attac
 
     entity->animation_frame_number = 0;
 
-    EN_SetStateBit(entity, EN_ALIVE_BIT);
+    EN_SetStateBit(entity, EN_STATE_ALIVE);
 }
 
 int EN_SetupInSrray(Entity entity_array[], int array_len, int x, int y, u8 w, u8 h, u16 max_health, u8 attack_delay)

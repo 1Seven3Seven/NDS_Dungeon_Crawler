@@ -3,8 +3,8 @@
 
 #include <nds.h>
 
-#define EN_ALIVE_BIT 0
-#define EN_MOVING_BIT 1
+#define EN_STATE_ALIVE 0
+#define EN_STATE_MOVING 1
 
 typedef struct _Entity
 {

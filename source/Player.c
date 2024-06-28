@@ -17,10 +17,10 @@ void PL_Move(Entity *player, uint32 keys_held)
     if (keys_held & KEY_DOWN) vy += PL_MOVE_SPEED;
 
     if (vx || vy)
-        EN_SetStateBit(player, EN_MOVING_BIT);
+        EN_SetStateBit(player, EN_STATE_MOVING);
     else
     {
-        EN_ClearStateBit(player, EN_MOVING_BIT);
+        EN_ClearStateBit(player, EN_STATE_MOVING);
         return;  // No movement so we can finish here
     }
 
@@ -36,7 +36,7 @@ void PL_Move(Entity *player, uint32 keys_held)
 
 void PL_Animate(Entity *player, u16 *player_gfx, int frame_counter)
 {
-    if (EN_GetStateBit(player, EN_MOVING_BIT))
+    if (EN_GetStateBit(player, EN_STATE_MOVING))
         player->animation_frame_number = 2 + (frame_counter / 10) % 2;
     else
         player->animation_frame_number = (frame_counter / 30) % 2;

@@ -7,7 +7,7 @@ void SK_Update(Entity *skeleton, Entity *player)
 
     if ((abs(x_diff) + abs(y_diff)) < 32)
     {
-        EN_ClearStateBit(skeleton, EN_MOVING_BIT);
+        EN_ClearStateBit(skeleton, EN_STATE_MOVING);
         return;
     }
 
@@ -26,5 +26,5 @@ void SK_Update(Entity *skeleton, Entity *player)
     skeleton->x += x_move;
     skeleton->y += y_move;
 
-    EN_SetStateBit(skeleton, EN_MOVING_BIT);
+    EN_SetStateBit(skeleton, EN_STATE_MOVING);
 }

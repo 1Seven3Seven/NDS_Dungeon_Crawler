@@ -53,7 +53,7 @@
 
 void animate_skeleton(u16 *skeleton_gfx, int frame_counter, Entity *skeleton_entity)
 {
-    if (EN_GetStateBit(skeleton_entity, EN_MOVING_BIT))
+    if (EN_GetStateBit(skeleton_entity, EN_STATE_MOVING))
     {
         skeleton_entity->animation_frame_number = 2 + (frame_counter / 10) % 2;
     }
