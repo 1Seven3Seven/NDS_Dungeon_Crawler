@@ -60,13 +60,13 @@ void draw_pointer(u16 *gfx, SpriteSize sprite_size, int vx, int vy, u8 palette_i
     SD_draw_line(gfx, sprite_size, x1, y1, x2, y2, palette_index);
 }
 
-s8 x = -1, y = -1, w = -1, h = -1;
-
 void draw_attack_hitbox(u16 *gfx, SpriteSize sprite_size, s8 vx, s8 vy, u8 palette_index)
 {
     SD_fill(gfx, SpriteSize_16x16, 0);
 
     if (vx == 0 && vy == 0) return;
+
+    s8 x = -1, y = -1, w = -1, h = -1;
 
     x = vx < 0 ? 8 : 0;  // If pointing left then x = 8, else x = 0
     y = vy < 0 ? 8 : 0;  // If pointing up then   y = 8, else y = 0
@@ -117,14 +117,7 @@ int main(void)
     u16 *slime_gfx = oamAllocateGfx(&oamMain, SpriteSize_16x16, SpriteColorFormat_256Color);
     dmaCopy((u8 *)SpriteSheetTiles + ROW_OFFSET * 2, slime_gfx, SPRITE_SIZE);
 
-    u16 *attack_gfx = oamAllocateGfx(&oamMain, SpriteSize_16x16, SpriteColorFormat_256Color);
-    SD_fill(attack_gfx, SpriteSize_16x16, 0);
-
-    u16 *pointer_gfx = oamAllocateGfx(&oamMain, SpriteSize_8x8, SpriteColorFormat_256Color);
-    SD_fill(pointer_gfx, SpriteSize_8x8, 0);
-
     dmaCopy(SpriteSheetPal, SPRITE_PALETTE, SpriteSheetPalLen);
-    SPRITE_PALETTE[173] = RGB15(31, 31, 31);
 
     // Setting up a player entity list
     Entity players[NUM_PLAYERS];
@@ -196,48 +189,14 @@ int main(void)
            false                        // mosaic
     );
 
-    oamSet(&oamMain,                    // Oam
-           3,                           // id
-           0, 0,                        // x, y
-           0,                           // priority
-           0,                           // palette alpha
-           SpriteSize_16x16,            // sprite size
-           SpriteColorFormat_256Color,  // colour format
-           attack_gfx,                  // graphics pointer
-           -1,                          // affine index
-           false,                       // size double
-           false,                       // hide
-           false,                       // h flip
-           false,                       // v flip
-           false                        // mosaic
-    );
-
-    oamSet(&oamMain,                    // Oam
-           4,                           // id
-           10, 10,                      // x, y
-           0,                           // priority
-           0,                           // palette alpha
-           SpriteSize_8x8,              // sprite size
-           SpriteColorFormat_256Color,  // colour format
-           pointer_gfx,                 // graphics pointer
-           -1,                          // affine index
-           false,                       // size double
-           false,                       // hide
-           false,                       // h flip
-           false,                       // v flip
-           false                        // mosaic
-    );
-
     int frame_counter = 0;
-    int attack_counter = 0;
-    s8 vx = 1, vy = 0;
 
     while (1)
     {
         consoleClear();
         scanKeys();
         uint32 keys_held = keysHeld();
-        uint32 keys_down = keysDown();
+        // uint32 keys_down = keysDown();
 
         PL_Move(&players[0], keys_held);
 
