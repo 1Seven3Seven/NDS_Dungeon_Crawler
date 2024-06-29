@@ -1,6 +1,6 @@
 #include "Camera.h"
 
-CAM_ScrollXY CAM_ScrollOffsetForEntity(Entity *entity)
+CAM_ScrollXY CAM_ScrollOffsetForEntity(EN_Entity *entity)
 {
     s32 x = EN_CentreX(entity) - CAM_SCROLL_OFFSET_FROM_ENTITY_CENTRE_X;
     s32 y = EN_CentreY(entity) - CAM_SCROLL_OFFSET_FROM_ENTITY_CENTRE_Y;
@@ -23,7 +23,7 @@ CAM_ScrollXY CAM_ScrollOffsetForEntity(Entity *entity)
     return scroll;
 }
 
-void CAM_HideIfNotOnScreen(Entity *entity, int oam_id, CAM_ScrollXY scroll)
+void CAM_HideIfNotOnScreen(EN_Entity *entity, int oam_id, CAM_ScrollXY scroll)
 {
     int is_hidden = (EN_Left(entity) > SCREEN_WIDTH + scroll.x)     //
                     || (EN_Right(entity) < scroll.x)                //
@@ -33,7 +33,7 @@ void CAM_HideIfNotOnScreen(Entity *entity, int oam_id, CAM_ScrollXY scroll)
     oamSetHidden(&oamMain, oam_id, is_hidden);
 }
 
-void CAM_CentreOnPlayer(Entity players[], int players_len, int centre_index, Entity enemies[], int enemies_len,
+void CAM_CentreOnPlayer(EN_Entity players[], int players_len, int centre_index, EN_Entity enemies[], int enemies_len,
                         int bg_ids[], int bg_ids_len)
 {
     /*

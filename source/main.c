@@ -34,7 +34,7 @@
 #define SKELETON_INDEX 0
 #define SLIME_INDEX 1
 
-void display_entity_position(int line_number, const char *prepend, Entity *entity)
+void display_entity_position(int line_number, const char *prepend, EN_Entity *entity)
 {
     UI_PrintToLine(line_number, "%s%03d, %03d", prepend, (int)entity->x, (int)entity->y);
 }
@@ -120,24 +120,24 @@ int main(void)
     dmaCopy(SpriteSheetPal, SPRITE_PALETTE, SpriteSheetPalLen);
 
     // Setting up a player entity list
-    Entity players[NUM_PLAYERS];
+    EN_Entity players[NUM_PLAYERS];
     EN_InitArray(players, NUM_PLAYERS);
 
     // Setting up the players
     PL_SetupPlayer(&players[0], PLAYER_START_X, PLAYER_START_Y);
 
     // Setting up an enemy entity list
-    Entity enemies[NUM_ENEMIES];
+    EN_Entity enemies[NUM_ENEMIES];
     EN_InitArray(players, NUM_ENEMIES);
 
     // Setting up the enemies
 
     // The skeleton
-    EN_Setup(&enemies[SKELETON_INDEX], 10, 10, 32, 32, 1, 1);
+    SK_SetupSkeleton(&enemies[SKELETON_INDEX], 10, 10);
 
     // The slime
     SL_SetupSlime(&enemies[SLIME_INDEX], 250, 200);
-    SlimeState slime_state;
+    SL_SlimeState slime_state;
     SL_SetupSlimeState(&slime_state);
 
     // Initial x and y should not matter as we set the x and y each frame

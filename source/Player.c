@@ -1,14 +1,15 @@
 #include "Player.H"
 
+#include "EntityTypes.h"
 #include "GFX.h"
 #include "Map.h"
 
-void PL_SetupPlayer(Entity *player, int x, int y)
+void PL_SetupPlayer(EN_Entity *player, int x, int y)
 {
-    EN_Setup(player, x, y, PL_WIDTH, PL_HEIGHT, PL_MAX_HEALTH, PL_ATTACK_DELAY);
+    EN_Setup(player, x, y, PL_WIDTH, PL_HEIGHT, ET_PLAYER, PL_MAX_HEALTH, PL_ATTACK_DELAY);
 }
 
-void PL_Move(Entity *player, uint32 keys_held)
+void PL_Move(EN_Entity *player, uint32 keys_held)
 {
     int vx = 0, vy = 0;
     if (keys_held & KEY_LEFT) vx -= PL_MOVE_SPEED;
@@ -34,7 +35,7 @@ void PL_Move(Entity *player, uint32 keys_held)
     if (player->y > MAP_HEIGHT - player->h) player->y = MAP_HEIGHT - player->h;
 }
 
-void PL_Animate(Entity *player, u16 *player_gfx, int frame_counter)
+void PL_Animate(EN_Entity *player, u16 *player_gfx, int frame_counter)
 {
     if (EN_GetStateBit(player, EN_STATE_MOVING))
         player->animation_frame_number = 2 + (frame_counter / 10) % 2;

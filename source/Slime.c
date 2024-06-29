@@ -4,19 +4,20 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 
+#include "EntityTypes.h"
 #include "GFX.h"
 
-void SL_SetupSlime(Entity *slime, int x, int y)
+void SL_SetupSlime(EN_Entity *slime, int x, int y)
 {
-    EN_Setup(slime, x, y, SL_WIDTH, SL_HEIGHT, SL_MAX_HEALTH, SL_ATTACK_DELAY);
+    EN_Setup(slime, x, y, SL_WIDTH, SL_HEIGHT, ET_SLIME, SL_MAX_HEALTH, SL_ATTACK_DELAY);
 }
 
-void SL_SetupSlimeState(SlimeState *slime_state)
+void SL_SetupSlimeState(SL_SlimeState *slime_state)
 {
     slime_state->velocity = 0;  //
 }
 
-void SL_Update(Entity *slime, SlimeState *slime_state, Entity *player)
+void SL_Update(EN_Entity *slime, SL_SlimeState *slime_state, EN_Entity *player)
 {
     // Wait till we can move
     if (slime->current_attack_delay > 0)
@@ -78,7 +79,7 @@ void SL_Update(Entity *slime, SlimeState *slime_state, Entity *player)
     slime_state->velocity--;
 }
 
-void SL_Animate(Entity *slime, u16 *slime_gfx, int frame_counter)
+void SL_Animate(EN_Entity *slime, u16 *slime_gfx, int frame_counter)
 {
     if (EN_GetStateBit(slime, EN_STATE_MOVING))
     {

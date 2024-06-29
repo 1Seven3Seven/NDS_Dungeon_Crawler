@@ -23,12 +23,12 @@
 #define PL_ATTACK_DELAY 32
 
 /// Set up the given entity as a player.
-void PL_SetupPlayer(Entity *player, int x, int y);
+void PL_SetupPlayer(EN_Entity *player, int x, int y);
 
 /// Moves the player entity given the state of the held keys.
-void PL_Move(Entity *player, uint32 keys_held);
+void PL_Move(EN_Entity *player, uint32 keys_held);
 
 /// Animates the player by modifying its graphics.
-void PL_Animate(Entity *player, u16 *player_gfx, int frame_counter);
+void PL_Animate(EN_Entity *player, u16 *player_gfx, int frame_counter);
 
 #endif

@@ -1,8 +1,14 @@
 #include "Skeleton.h"
 
+#include "EntityTypes.h"
 #include "GFX.h"
 
-void SK_Update(Entity *skeleton, Entity *player)
+void SK_SetupSkeleton(EN_Entity *skeleton, int x, int y)
+{
+    EN_Setup(skeleton, x, y, SK_WIDTH, SK_HEIGHT, ET_SKELETON, SK_MAX_HEALTH, SK_ATTACK_DELAY);
+}
+
+void SK_Update(EN_Entity *skeleton, EN_Entity *player)
 {
     float x_diff = EN_CentreX(player) - EN_CentreX(skeleton);
     float y_diff = EN_CentreY(player) - EN_CentreY(skeleton);
@@ -31,7 +37,7 @@ void SK_Update(Entity *skeleton, Entity *player)
     EN_SetStateBit(skeleton, EN_STATE_MOVING);
 }
 
-void SK_Animate(Entity *skeleton, u16 *skeleton_gfx, int frame_counter)
+void SK_Animate(EN_Entity *skeleton, u16 *skeleton_gfx, int frame_counter)
 {
     if (EN_GetStateBit(skeleton, EN_STATE_MOVING))
     {

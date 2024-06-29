@@ -30,15 +30,15 @@ typedef struct _CAM_ScrollXY
 } CAM_ScrollXY;
 
 /// Calculates the x and y scroll offsets to centre the camera on the given entity.
-CAM_ScrollXY CAM_ScrollOffsetForEntity(Entity *entity);
+CAM_ScrollXY CAM_ScrollOffsetForEntity(EN_Entity *entity);
 
 /// Hides the given oam entry pointed to by `oam_id` if the entity does not appear on screen.
-void CAM_HideIfNotOnScreen(Entity *entity, int oam_id, CAM_ScrollXY scroll);
+void CAM_HideIfNotOnScreen(EN_Entity *entity, int oam_id, CAM_ScrollXY scroll);
 
 /// Uses oamSetXY to centre all player and enemy entities on the player indicated by `centre_index`.
 /// Scrolls the backgrounds to do the same.
-void CAM_CentreOnPlayer(Entity players[], int players_len, int centre_index,  //
-                        Entity enemies[], int enemies_len,                    //
+void CAM_CentreOnPlayer(EN_Entity players[], int players_len, int centre_index,  //
+                        EN_Entity enemies[], int enemies_len,                    //
                         int bg_ids[], int bg_ids_len);
 
 #endif

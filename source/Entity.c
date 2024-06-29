@@ -1,11 +1,11 @@
 #include "Entity.h"
 
-void EN_Init(Entity *entity)
+void EN_Init(EN_Entity *entity)
 {
     entity->state = 0;  //
 }
 
-void EN_InitArray(Entity entity_array[], int array_len)
+void EN_InitArray(EN_Entity entity_array[], int array_len)
 {
     for (int i = 0; i < array_len; i++)
     {
@@ -13,7 +13,7 @@ void EN_InitArray(Entity entity_array[], int array_len)
     }
 }
 
-void EN_Setup(Entity *entity, int x, int y, u8 w, u8 h, u16 max_health, u8 attack_delay)
+void EN_Setup(EN_Entity *entity, int x, int y, u8 w, u8 h, u16 max_health, u8 attack_delay)
 {
     entity->x = (float)x;
     entity->y = (float)y;
@@ -31,7 +31,7 @@ void EN_Setup(Entity *entity, int x, int y, u8 w, u8 h, u16 max_health, u8 attac
     EN_SetStateBit(entity, EN_STATE_ALIVE);
 }
 
-int EN_SetupInSrray(Entity entity_array[], int array_len, int x, int y, u8 w, u8 h, u16 max_health, u8 attack_delay)
+int EN_SetupInSrray(EN_Entity entity_array[], int array_len, int x, int y, u8 w, u8 h, u16 max_health, u8 attack_delay)
 {
     for (int i = 0; i < array_len; i++)
     {
@@ -45,7 +45,7 @@ int EN_SetupInSrray(Entity entity_array[], int array_len, int x, int y, u8 w, u8
     return -1;
 }
 
-void EN_TakeDamage(Entity *entity, int damage)
+void EN_TakeDamage(EN_Entity *entity, int damage)
 {
     entity->health -= damage;
     if (entity->health <= 0)
@@ -54,32 +54,32 @@ void EN_TakeDamage(Entity *entity, int damage)
     }
 }
 
-void EN_SetStateBit(Entity *entity, int bit) { entity->state |= 1 << bit; }
+void EN_SetStateBit(EN_Entity *entity, int bit) { entity->state |= 1 << bit; }
 
-void EN_ClearStateBit(Entity *entity, int bit) { entity->state &= ~(1 << bit); }
+void EN_ClearStateBit(EN_Entity *entity, int bit) { entity->state &= ~(1 << bit); }
 
-int EN_GetStateBit(Entity *entity, int bit) { return entity->state & (1 << bit); }
+int EN_GetStateBit(EN_Entity *entity, int bit) { return entity->state & (1 << bit); }
 
-int EN_CentreX(Entity *entity) { return entity->x + entity->w / 2; }
+int EN_CentreX(EN_Entity *entity) { return entity->x + entity->w / 2; }
 
-int EN_CentreY(Entity *entity) { return entity->y + entity->h / 2; }
+int EN_CentreY(EN_Entity *entity) { return entity->y + entity->h / 2; }
 
-float EN_CentreXf(Entity *entity) { return entity->x + (float)entity->w / 2; }
+float EN_CentreXf(EN_Entity *entity) { return entity->x + (float)entity->w / 2; }
 
-float EN_CentreYf(Entity *entity) { return entity->y + (float)entity->h / 2; }
+float EN_CentreYf(EN_Entity *entity) { return entity->y + (float)entity->h / 2; }
 
-int EN_Left(Entity *entity) { return entity->x; }
+int EN_Left(EN_Entity *entity) { return entity->x; }
 
-int EN_Right(Entity *entity) { return entity->x + entity->w; }
+int EN_Right(EN_Entity *entity) { return entity->x + entity->w; }
 
-int EN_Top(Entity *entity) { return entity->y; }
+int EN_Top(EN_Entity *entity) { return entity->y; }
 
-int EN_Bottom(Entity *entity) { return entity->y + entity->h; }
+int EN_Bottom(EN_Entity *entity) { return entity->y + entity->h; }
 
-int EN_Leftf(Entity *entity) { return entity->x; }
+int EN_Leftf(EN_Entity *entity) { return entity->x; }
 
-int EN_Rightf(Entity *entity) { return entity->x + entity->w; }
+int EN_Rightf(EN_Entity *entity) { return entity->x + entity->w; }
 
-int EN_Topf(Entity *entity) { return entity->y; }
+int EN_Topf(EN_Entity *entity) { return entity->y; }
 
-int EN_Bottomf(Entity *entity) { return entity->y + entity->h; }
+int EN_Bottomf(EN_Entity *entity) { return entity->y + entity->h; }
