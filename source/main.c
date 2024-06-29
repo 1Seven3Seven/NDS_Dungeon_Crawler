@@ -10,6 +10,7 @@
 #include <string.h>
 
 // My libraries
+#include "Camera.h"
 #include "Entity.h"
 #include "GFX.h"  // Includes the sprite sheet and backgrounds
 #include "Map.h"
@@ -44,12 +45,12 @@
 /// The maximum y scroll value
 #define SCROLL_MAX_Y MAP_HEIGHT - SCREEN_HEIGHT
 
-/// The number of entities that are being used in this demo
-#define NUM_ENTITIES 3
+#define NUM_BACKGROUNDS 1
+#define NUM_PLAYERS 1
+#define NUM_ENEMIES 2
 
-#define PLAYER_INDEX 0
-#define SKELETON_INDEX 1
-#define SLIME_INDEX 2
+#define SKELETON_INDEX 0
+#define SLIME_INDEX 1
 
 void animate_skeleton(u16 *skeleton_gfx, int frame_counter, Entity *skeleton_entity)
 {
@@ -65,60 +66,6 @@ void animate_skeleton(u16 *skeleton_gfx, int frame_counter, Entity *skeleton_ent
     dmaCopy((u8 *)SpriteSheetTiles + ROW_OFFSET + SPRITE_SIZE * skeleton_entity->animation_frame_number,  //
             skeleton_gfx,                                                                                 //
             SPRITE_SIZE);
-}
-
-void hide_if_not_on_screen(Entity *entity, int oam_id, int offset_x, int offset_y)
-{
-    if (entity->x > SCREEN_WIDTH + offset_x)
-        oamSetHidden(&oamMain, oam_id, true);
-    else if (entity->x + entity->w < offset_x)
-        oamSetHidden(&oamMain, oam_id, true);
-    else if (entity->y > SCREEN_HEIGHT + offset_y)
-        oamSetHidden(&oamMain, oam_id, true);
-    else if (entity->y + entity->h < offset_y)
-        oamSetHidden(&oamMain, oam_id, true);
-    else
-        oamSetHidden(&oamMain, oam_id, false);
-}
-
-void set_oam_positions(Entity entities[], int array_len, int offset_x, int offset_y)
-{
-    for (int i = 0; i < array_len; i++)
-    {
-        hide_if_not_on_screen(&entities[i], i, offset_x, offset_y);
-        oamSetXY(&oamMain, i, entities[i].x - offset_x, entities[i].y - offset_y);
-    }
-}
-
-void centre_on_entity(Entity entities[], int entities_len, int centre_index, int bg_ids[], int bg_ids_len)
-{
-    int scroll_x = EN_CentreX(&entities[centre_index]) - SCROLL_OFFSET_FROM_ENTITY_CENTRE_X;
-    int scroll_y = EN_CentreY(&entities[centre_index]) - SCROLL_OFFSET_FROM_ENTITY_CENTRE_Y;
-
-    if (scroll_x < 0)
-    {
-        scroll_x = 0;
-    }
-    else if (scroll_x > SCROLL_MAX_X)
-    {
-        scroll_x = SCROLL_MAX_X;
-    }
-
-    if (scroll_y < 0)
-    {
-        scroll_y = 0;
-    }
-    else if (scroll_y > SCROLL_MAX_Y)
-    {
-        scroll_y = SCROLL_MAX_Y;
-    }
-
-    for (int i = 0; i < bg_ids_len; i++)
-    {
-        bgSetScroll(bg_ids[i], scroll_x, scroll_y);
-    }
-
-    set_oam_positions(entities, entities_len, scroll_x, scroll_y);
 }
 
 void display_entity_position(int line_number, const char *prepend, Entity *entity)
@@ -187,7 +134,7 @@ int main(void)
     UI_ResetDisplayBuffer();
 
     // Background
-    int bg_ids[1];
+    int bg_ids[NUM_BACKGROUNDS];
     bg_ids[0] = bgInit(0, BgType_Text8bpp, BgSize_T_512x512, 0, 1);
     dmaCopy(BasicBackgroundTiles, BG_TILE_RAM(1), BasicBackgroundTilesLen);
     dmaCopy(BasicBackgroundMap, BG_MAP_RAM(0), BasicBackgroundMapLen);
@@ -213,18 +160,24 @@ int main(void)
     dmaCopy(SpriteSheetPal, SPRITE_PALETTE, SpriteSheetPalLen);
     SPRITE_PALETTE[173] = RGB15(31, 31, 31);
 
-    // Setting up some entites
-    Entity entities[NUM_ENTITIES];
-    EN_InitArray(entities, NUM_ENTITIES);
+    // Setting up a player entity list
+    Entity players[NUM_PLAYERS];
+    EN_InitArray(players, NUM_PLAYERS);
 
-    // The player
-    PL_SetupPlayer(&entities[PLAYER_INDEX], PLAYER_START_X, PLAYER_START_Y);
+    // Setting up the players
+    PL_SetupPlayer(&players[0], PLAYER_START_X, PLAYER_START_Y);
+
+    // Setting up an enemy entity list
+    Entity enemies[NUM_ENEMIES];
+    EN_InitArray(players, NUM_ENEMIES);
+
+    // Setting up the enemies
 
     // The skeleton
-    EN_Setup(&entities[SKELETON_INDEX], 10, 10, 32, 32, 1, 1);
+    EN_Setup(&enemies[SKELETON_INDEX], 10, 10, 32, 32, 1, 1);
 
     // The slime
-    SL_SetupSlime(&entities[SLIME_INDEX], 250, 200);
+    SL_SetupSlime(&enemies[SLIME_INDEX], 250, 200);
     SlimeState slime_state;
     SL_SetupSlimeState(&slime_state);
 
@@ -311,7 +264,6 @@ int main(void)
 
     int frame_counter = 0;
     int attack_counter = 0;
-    int centre_entity_index = PLAYER_INDEX;
     s8 vx = 1, vy = 0;
 
     while (1)
@@ -321,110 +273,21 @@ int main(void)
         uint32 keys_held = keysHeld();
         uint32 keys_down = keysDown();
 
-        PL_Move(&entities[PLAYER_INDEX], keys_held);
+        PL_Move(&players[0], keys_held);
 
-        // Get a vector in the direction the player is moving
-        if (!attack_counter)
-        {
-            if (keys_held & KEY_ARROWS)
-            {
-                vx = 0;
-                vy = 0;
-            }
+        SK_Update(&enemies[SKELETON_INDEX], &players[0]);
+        SL_Update(&enemies[SLIME_INDEX], &slime_state, &players[0]);
 
-            if (keys_held & KEY_UP) vy--;
-            if (keys_held & KEY_DOWN) vy++;
-            if (keys_held & KEY_LEFT) vx--;
-            if (keys_held & KEY_RIGHT) vx++;
-        }
+        PL_Animate(&players[0], player_gfx, frame_counter);
+        animate_skeleton(skeleton_gfx, frame_counter, &enemies[SKELETON_INDEX]);
+        SL_Animate(&enemies[SLIME_INDEX], slime_gfx, frame_counter);
 
-        // Scroll code copied from the centre on entity function
-        // For testing purposes this is here
-        int scroll_x = EN_CentreX(&entities[centre_entity_index]) - SCROLL_OFFSET_FROM_ENTITY_CENTRE_X;
-        int scroll_y = EN_CentreY(&entities[centre_entity_index]) - SCROLL_OFFSET_FROM_ENTITY_CENTRE_Y;
-        if (scroll_x < 0)
-            scroll_x = 0;
-        else if (scroll_x > SCROLL_MAX_X)
-            scroll_x = SCROLL_MAX_X;
-        if (scroll_y < 0)
-            scroll_y = 0;
-        else if (scroll_y > SCROLL_MAX_Y)
-            scroll_y = SCROLL_MAX_Y;
-
-        // Draw the pointer given the move direction
-        draw_pointer(pointer_gfx, SpriteSize_8x8, vx, vy, 173);
-        oamSetXY(
-            &oamMain, 4,                                                  //
-            EN_CentreX(&entities[PLAYER_INDEX])                           //
-                + (entities[PLAYER_INDEX].w / 2 + (vx < 0 ? 8 : 0)) * vx  // Adjust to the left or right of the player
-                - (vx == 0 && vy ? 4 : 0)                                 // Adjust left or right if directly up or down
-                - scroll_x,                                               //
-            EN_CentreY(&entities[PLAYER_INDEX])                           //
-                + (entities[PLAYER_INDEX].h / 2 + (vy < 0 ? 8 : 0)) * vy  // Adjust to the top or bottom of the player
-                - (vy == 0 && vx ? 4 : 0)                                 // Adjust up or down if directly left or right
-                - scroll_y                                                //
-        );
-
-        // Player attack cooldown
-        if (entities[PLAYER_INDEX].current_attack_delay > 0) entities[PLAYER_INDEX].current_attack_delay--;
-        // Player attack
-        else if (keys_held & KEY_A && entities[PLAYER_INDEX].current_attack_delay == 0)
-        {
-            // Draw the attack hitbox
-            draw_attack_hitbox(attack_gfx, SpriteSize_16x16, vx, vy, 173);
-
-            // Show the attack hitbox
-            oamSetHidden(&oamMain, 3, false);
-
-            //
-            attack_counter = 8;
-            entities[PLAYER_INDEX].current_attack_delay = entities[PLAYER_INDEX].attack_delay;
-        }
-
-        // Maintaining the attack hitbox
-        if (attack_counter > 0)
-        {
-            oamSetXY(&oamMain, 3,                                                                     //
-                     (vx > 0 ? EN_Right(&entities[PLAYER_INDEX]) : EN_Left(&entities[PLAYER_INDEX]))  //
-                         - (vx < 0 ? 16 : 0)                                                          //
-                         - scroll_x,                                                                  //
-                     (vy > 0 ? EN_Bottom(&entities[PLAYER_INDEX]) : EN_Top(&entities[PLAYER_INDEX]))  //
-                         - (vy < 0 ? 16 : 0)                                                          //
-                         - scroll_y                                                                   //
-            );
-            attack_counter--;
-        }
-        // Clearing the attack hitbox
-        else if (attack_counter == 0)
-            oamSetHidden(&oamMain, 3, true);
-
-        SK_Update(&entities[SKELETON_INDEX], &entities[PLAYER_INDEX]);
-        SL_Update(&entities[SLIME_INDEX], &slime_state, &entities[PLAYER_INDEX]);
-
-        PL_Animate(&entities[PLAYER_INDEX], player_gfx, frame_counter);
-        animate_skeleton(skeleton_gfx, frame_counter, &entities[SKELETON_INDEX]);
-        SL_Animate(&entities[SLIME_INDEX], slime_gfx, frame_counter);
-
-        if (keys_down & KEY_L)
-        {
-            centre_entity_index--;
-            if (centre_entity_index < 0) centre_entity_index = NUM_ENTITIES - 1;
-        }
-        if (keys_down & KEY_R)
-        {
-            centre_entity_index++;
-            if (centre_entity_index >= NUM_ENTITIES) centre_entity_index = 0;
-        }
-
-        centre_on_entity(entities, NUM_ENTITIES, centre_entity_index, bg_ids, 1);
+        CAM_CentreOnPlayer(players, NUM_PLAYERS, 0, enemies, NUM_ENEMIES, bg_ids, NUM_BACKGROUNDS);
 
         UI_PrintToLine(0, "frame_counter = %d", frame_counter);
-        display_entity_position(1, "Player pos   = ", &entities[PLAYER_INDEX]);
-        display_entity_position(2, "Skeleton pos = ", &entities[SKELETON_INDEX]);
-        display_entity_position(3, "Slime pos    = ", &entities[SLIME_INDEX]);
-
-        UI_PrintToLine(5, "attack vector = %02d, %02d", vx, vy);
-        UI_PrintToLine(6, "attack hitbox = %02d, %02d, %02d, %02d", x, y, w, h);
+        display_entity_position(1, "Player pos   = ", &players[0]);
+        display_entity_position(2, "Skeleton pos = ", &enemies[SKELETON_INDEX]);
+        display_entity_position(3, "Slime pos    = ", &enemies[SLIME_INDEX]);
 
         frame_counter++;
         UI_PrintDisplayBuffer();
