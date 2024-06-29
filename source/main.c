@@ -52,22 +52,6 @@
 #define SKELETON_INDEX 0
 #define SLIME_INDEX 1
 
-void animate_skeleton(u16 *skeleton_gfx, int frame_counter, Entity *skeleton_entity)
-{
-    if (EN_GetStateBit(skeleton_entity, EN_STATE_MOVING))
-    {
-        skeleton_entity->animation_frame_number = 2 + (frame_counter / 10) % 2;
-    }
-    else
-    {
-        skeleton_entity->animation_frame_number = (frame_counter / 30) % 2;
-    }
-
-    dmaCopy((u8 *)SpriteSheetTiles + ROW_OFFSET + SPRITE_SIZE * skeleton_entity->animation_frame_number,  //
-            skeleton_gfx,                                                                                 //
-            SPRITE_SIZE);
-}
-
 void display_entity_position(int line_number, const char *prepend, Entity *entity)
 {
     UI_PrintToLine(line_number, "%s%03d, %03d", prepend, (int)entity->x, (int)entity->y);
@@ -279,7 +263,7 @@ int main(void)
         SL_Update(&enemies[SLIME_INDEX], &slime_state, &players[0]);
 
         PL_Animate(&players[0], player_gfx, frame_counter);
-        animate_skeleton(skeleton_gfx, frame_counter, &enemies[SKELETON_INDEX]);
+        SL_Animate(&enemies[SKELETON_INDEX], skeleton_gfx, frame_counter);
         SL_Animate(&enemies[SLIME_INDEX], slime_gfx, frame_counter);
 
         CAM_CentreOnPlayer(players, NUM_PLAYERS, 0, enemies, NUM_ENEMIES, bg_ids, NUM_BACKGROUNDS);
