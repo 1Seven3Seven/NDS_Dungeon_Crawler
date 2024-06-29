@@ -20,12 +20,12 @@
 #include "SpriteDrawing.h"
 #include "UI.h"
 
-#define KEY_ARROWS (KEY_LEFT | KEY_RIGHT | KEY_UP | KEY_DOWN)
-
 /// Centre of the player at the centre of the map
 #define PLAYER_START_X MAP_WIDTH / 2 - PL_WIDTH / 2
 /// Centre of the player at the centre of the map
 #define PLAYER_START_Y MAP_HEIGHT / 2 - PL_HEIGHT / 2
+
+#define KEY_ARROWS (KEY_LEFT | KEY_RIGHT | KEY_UP | KEY_DOWN)
 
 #define NUM_BACKGROUNDS 1
 #define NUM_PLAYERS 1
