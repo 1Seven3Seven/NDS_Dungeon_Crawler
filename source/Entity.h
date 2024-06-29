@@ -18,8 +18,9 @@ typedef struct _EN_Entity
     /// Size
     u8 w, h;
 
-    /// What type of entity this is
-    u8 type;
+    /// What type of entity this is.
+    /// -1 means unset.
+    s8 type;
 
     /// Health
     u16 health;
@@ -51,7 +52,7 @@ void EN_InitArray(EN_Entity entity_array[], int array_len);
 void EN_Setup(EN_Entity *entity,  //
               int x, int y,       //
               u8 w, u8 h,         //
-              u8 type,            //
+              s8 type,            //
               u16 max_health,     //
               u8 attack_delay);
 
@@ -61,7 +62,7 @@ void EN_Setup(EN_Entity *entity,  //
 int EN_SetupInSrray(EN_Entity entity_array[], int array_len,  //
                     int x, int y,                             //
                     u8 w, u8 h,                               //
-                    u8 type,                                  //
+                    s8 type,                                  //
                     u16 max_health,                           //
                     u8 attack_delay);
 
