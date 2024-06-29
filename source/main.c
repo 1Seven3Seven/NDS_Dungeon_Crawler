@@ -245,7 +245,7 @@ int main(void)
         SL_Update(&enemies[SLIME_INDEX], &slime_state, &players[0]);
 
         PL_Animate(&players[0], player_gfx, frame_counter);
-        SL_Animate(&enemies[SKELETON_INDEX], skeleton_gfx, frame_counter);
+        SK_Animate(&enemies[SKELETON_INDEX], skeleton_gfx, frame_counter);
         SL_Animate(&enemies[SLIME_INDEX], slime_gfx, frame_counter);
 
         CAM_CentreOnPlayer(players, NUM_PLAYERS, 0, enemies, NUM_ENEMIES, bg_ids, NUM_BACKGROUNDS);

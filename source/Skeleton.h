@@ -7,6 +7,6 @@
 void SK_Update(Entity *skeleton, Entity *player);
 
 ///
-void SL_Animate(Entity *skeleton, u16 *skeleton_gfx, int frame_counter);
+void SK_Animate(Entity *skeleton, u16 *skeleton_gfx, int frame_counter);
 
 #endif

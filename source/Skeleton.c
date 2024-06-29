@@ -4,8 +4,8 @@
 
 void SK_Update(Entity *skeleton, Entity *player)
 {
-    float x_diff = player->x - skeleton->x;
-    float y_diff = player->y - skeleton->y;
+    float x_diff = EN_CentreX(player) - EN_CentreX(skeleton);
+    float y_diff = EN_CentreY(player) - EN_CentreY(skeleton);
 
     if ((abs(x_diff) + abs(y_diff)) < 32)
     {
@@ -31,7 +31,7 @@ void SK_Update(Entity *skeleton, Entity *player)
     EN_SetStateBit(skeleton, EN_STATE_MOVING);
 }
 
-void SL_Animate(Entity *skeleton, u16 *skeleton_gfx, int frame_counter)
+void SK_Animate(Entity *skeleton, u16 *skeleton_gfx, int frame_counter)
 {
     if (EN_GetStateBit(skeleton, EN_STATE_MOVING))
     {
@@ -42,7 +42,7 @@ void SL_Animate(Entity *skeleton, u16 *skeleton_gfx, int frame_counter)
         skeleton->animation_frame_number = (frame_counter / 30) % 2;
     }
 
-    dmaCopy((u8 *)skeleton + ROW_OFFSET + SPRITE_SIZE * skeleton->animation_frame_number,  //
-            skeleton_gfx,                                                                  //
+    dmaCopy((u8 *)SpriteSheetTiles + ROW_OFFSET + SPRITE_SIZE * skeleton->animation_frame_number,  //
+            skeleton_gfx,                                                                          //
             SPRITE_SIZE);
 }
