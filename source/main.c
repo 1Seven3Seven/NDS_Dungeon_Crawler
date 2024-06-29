@@ -22,28 +22,10 @@
 
 #define KEY_ARROWS (KEY_LEFT | KEY_RIGHT | KEY_UP | KEY_DOWN)
 
-#define SCREEN_WIDTH 256
-#define SCREEN_HEIGHT 192
-
-#define PLAYER_WIDTH 11
-#define PLAYER_HEIGHT 15
-
-#define PLAYER_MOVE_SPEED 1
-
 /// Centre of the player at the centre of the map
-#define PLAYER_START_X MAP_WIDTH / 2 - PLAYER_WIDTH / 2
+#define PLAYER_START_X MAP_WIDTH / 2 - PL_WIDTH / 2
 /// Centre of the player at the centre of the map
-#define PLAYER_START_Y MAP_HEIGHT / 2 - PLAYER_HEIGHT / 2
-
-/// The offset from the player centre's x position the scroll should be
-#define SCROLL_OFFSET_FROM_ENTITY_CENTRE_X SCREEN_WIDTH / 2
-/// The offset from the player centre's y position the scroll should be
-#define SCROLL_OFFSET_FROM_ENTITY_CENTRE_Y SCREEN_HEIGHT / 2
-
-/// The maximum x scroll value
-#define SCROLL_MAX_X MAP_WIDTH - SCREEN_WIDTH
-/// The maximum y scroll value
-#define SCROLL_MAX_Y MAP_HEIGHT - SCREEN_HEIGHT
+#define PLAYER_START_Y MAP_HEIGHT / 2 - PL_HEIGHT / 2
 
 #define NUM_BACKGROUNDS 1
 #define NUM_PLAYERS 1
