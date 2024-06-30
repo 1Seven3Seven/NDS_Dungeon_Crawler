@@ -9,7 +9,7 @@ void SK_SetupSkeleton(EN_Entity *skeleton, int x, int y)
     EN_Setup(skeleton, x, y, SK_WIDTH, SK_HEIGHT, ET_SKELETON, SK_MAX_HEALTH, SK_ATTACK_DELAY);
 }
 
-void SK_Update(EN_Entity *skeleton, EN_Entity players[], int player_len)
+void SK_Update(EN_Entity *skeleton, EN_Entity players[], int players_len)
 {
     /*
     When setting the initila min distance squared, I use the distance from two opposite corners of the map.
@@ -19,7 +19,7 @@ void SK_Update(EN_Entity *skeleton, EN_Entity players[], int player_len)
     // Find the x and y difference to the closest player
     float min_distance_squared = MAP_WIDTH * MAP_WIDTH + MAP_HEIGHT * MAP_HEIGHT + 1;
     float x_diff = 0, y_diff = 0;
-    for (int i = 0; i < player_len; i++)
+    for (int i = 0; i < players_len; i++)
     {
         float new_x_diff = EN_CentreXf(&players[i]) - EN_CentreXf(skeleton);
         float new_y_diff = EN_CentreYf(&players[i]) - EN_CentreYf(skeleton);

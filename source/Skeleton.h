@@ -19,7 +19,7 @@
 void SK_SetupSkeleton(EN_Entity *skeleton, int x, int y);
 
 ///
-void SK_Update(EN_Entity *skeleton, EN_Entity players[], int player_len);
+void SK_Update(EN_Entity *skeleton, EN_Entity players[], int players_len);
 
 ///
 void SK_Animate(EN_Entity *skeleton, u16 *skeleton_gfx, int frame_counter);
