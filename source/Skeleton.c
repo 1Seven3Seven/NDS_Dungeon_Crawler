@@ -17,7 +17,7 @@ void SK_Update(EN_Entity *skeleton, EN_Entity players[], int players_len)
     */
 
     // Find the x and y difference to the closest player
-    float min_distance_squared = MAP_WIDTH * MAP_WIDTH + MAP_HEIGHT * MAP_HEIGHT + 1;
+    float min_distance_squared = MAP_MAX_STRAIGHT_DISTANCE_SQUARED;
     float x_diff = 0, y_diff = 0;
     for (int i = 0; i < players_len; i++)
     {
