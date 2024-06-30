@@ -7,8 +7,8 @@
 
 #include "Entity.h"
 
-#define SK_WIDTH 32
-#define SK_HEIGHT 32
+#define SK_WIDTH 7
+#define SK_HEIGHT 15
 
 #define SK_MAX_HEALTH 100
 #define SK_ATTACK_DELAY 60
