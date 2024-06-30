@@ -13,11 +13,13 @@
 #define SK_MAX_HEALTH 100
 #define SK_ATTACK_DELAY 60
 
+#define SK_MIN_DISTANCE_TO_ATTACK_PLAYER_SQUARED 32 * 32
+
 ///
 void SK_SetupSkeleton(EN_Entity *skeleton, int x, int y);
 
 ///
-void SK_Update(EN_Entity *skeleton, EN_Entity *player);
+void SK_Update(EN_Entity *skeleton, EN_Entity players[], int player_len);
 
 ///
 void SK_Animate(EN_Entity *skeleton, u16 *skeleton_gfx, int frame_counter);
