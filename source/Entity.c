@@ -80,10 +80,10 @@ int EN_Top(EN_Entity *entity) { return entity->y; }
 
 int EN_Bottom(EN_Entity *entity) { return entity->y + entity->h; }
 
-int EN_Leftf(EN_Entity *entity) { return entity->x; }
+float EN_Leftf(EN_Entity *entity) { return entity->x; }
 
-int EN_Rightf(EN_Entity *entity) { return entity->x + entity->w; }
+float EN_Rightf(EN_Entity *entity) { return entity->x + entity->w; }
 
-int EN_Topf(EN_Entity *entity) { return entity->y; }
+float EN_Topf(EN_Entity *entity) { return entity->y; }
 
-int EN_Bottomf(EN_Entity *entity) { return entity->y + entity->h; }
+float EN_Bottomf(EN_Entity *entity) { return entity->y + entity->h; }

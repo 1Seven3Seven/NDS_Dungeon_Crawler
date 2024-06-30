@@ -104,15 +104,15 @@ int EN_Top(EN_Entity *entity);
 int EN_Bottom(EN_Entity *entity);
 
 /// Returns the x value of the left of the entity.
-int EN_Leftf(EN_Entity *entity);
+float EN_Leftf(EN_Entity *entity);
 
 /// Returns the x value of the right of the entity.
-int EN_Rightf(EN_Entity *entity);
+float EN_Rightf(EN_Entity *entity);
 
 /// Returns the y value of the top of the entity.
-int EN_Topf(EN_Entity *entity);
+float EN_Topf(EN_Entity *entity);
 
 /// Returns the y value of the bottom of the entity.
-int EN_Bottomf(EN_Entity *entity);
+float EN_Bottomf(EN_Entity *entity);
 
 #endif
