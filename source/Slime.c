@@ -6,6 +6,7 @@
 
 #include "EntityTypes.h"
 #include "GFX.h"
+#include "Map.h"
 
 void SL_SetupSlime(EN_Entity *slime, int x, int y)
 {
@@ -17,7 +18,7 @@ void SL_SetupSlimeState(SL_SlimeState *slime_state)
     slime_state->velocity = 0;  //
 }
 
-void SL_Update(EN_Entity *slime, SL_SlimeState *slime_state, EN_Entity *player)
+void SL_Update(EN_Entity *slime, SL_SlimeState *slime_state, EN_Entity players[], int players_len)
 {
     // Wait till we can move
     if (slime->current_attack_delay > 0)
@@ -29,24 +30,37 @@ void SL_Update(EN_Entity *slime, SL_SlimeState *slime_state, EN_Entity *player)
     // We can move, so chose a direction if not moving
     if (slime_state->velocity == -1)
     {
-        slime_state->velocity = SL_INITIAL_VELOCITY;
+        // Find the closest player to jump to
+        float min_distance_squared = MAP_MAX_STRAIGHT_DISTANCE_SQUARED;
+        float x_diff = 0, y_diff = 0;
 
-        float diff_x = EN_CentreXf(player) - EN_CentreXf(slime);
-        float diff_y = EN_CentreYf(player) - EN_CentreYf(slime);
+        for (int i = 0; i < players_len; i++)
+        {
+            float new_x_diff = EN_CentreXf(&players[i]) - EN_CentreXf(slime);
+            float new_y_diff = EN_CentreYf(&players[i]) - EN_CentreYf(slime);
 
-        float diff_x_squared = diff_x * diff_x;
-        float diff_y_squared = diff_y * diff_y;
+            float new_x_diff_squared = new_x_diff * new_x_diff;
+            float new_y_diff_squared = new_y_diff * new_y_diff;
 
-        // Jump at the player if close enough else random
+            float new_distance_squared = new_x_diff_squared + new_y_diff_squared;
+
+            if (new_distance_squared < min_distance_squared)
+            {
+                min_distance_squared = new_distance_squared;
+                x_diff = new_x_diff;
+                y_diff = new_y_diff;
+            }
+        }
+
+        // Jump at the closest player if we are close enough to them else a random direction
         float direction;
-        if (diff_x_squared + diff_y_squared < SL_MAX_DISTANCE_ATTACK_PLAYER_SQUARED)
-        {
-            direction = -atan2f(diff_y, diff_x);
-        }
+        if (min_distance_squared < SL_MAX_DISTANCE_ATTACK_PLAYER_SQUARED)
+            direction = -atan2f(y_diff, x_diff);
         else
-        {
             direction = ((float)rand() / RAND_MAX) * (M_PI * 2);
-        }
+
+        // Set the velocity and vector
+        slime_state->velocity = SL_INITIAL_VELOCITY;
 
         slime_state->vx = cosf(direction);
         slime_state->vy = -sinf(direction);

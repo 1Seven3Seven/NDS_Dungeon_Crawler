@@ -204,7 +204,7 @@ int main(void)
         }
 
         SK_Update(&enemies[SKELETON_INDEX], players, NUM_PLAYERS);
-        SL_Update(&enemies[SLIME_INDEX], &slime_state, &players[0]);
+        SL_Update(&enemies[SLIME_INDEX], &slime_state, players, NUM_PLAYERS);
 
         for (int i = 0; i < NUM_PLAYERS; i++)
         {
