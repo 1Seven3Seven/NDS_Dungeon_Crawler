@@ -39,54 +39,6 @@ void display_entity_position(int line_number, const char *prepend, EN_Entity *en
     UI_PrintToLine(line_number, "%s%03d, %03d", prepend, (int)entity->x, (int)entity->y);
 }
 
-void draw_pointer(u16 *gfx, SpriteSize sprite_size, int vx, int vy, u8 palette_index)
-{
-    SD_fill(gfx, sprite_size, 0);
-
-    if (vx == 0 && vy == 0) return;
-
-    u8 x1 = 4 - vx * 4;
-    u8 y1 = 4 - vy * 4;
-
-    if (x1 == 8) x1 = 7;
-    if (y1 == 8) y1 = 7;
-
-    u8 x2 = 4 + vx * 4;
-    u8 y2 = 4 + vy * 4;
-
-    if (x2 == 8) x2 = 7;
-    if (y2 == 8) y2 = 7;
-
-    SD_draw_line(gfx, sprite_size, x1, y1, x2, y2, palette_index);
-}
-
-void draw_attack_hitbox(u16 *gfx, SpriteSize sprite_size, s8 vx, s8 vy, u8 palette_index)
-{
-    SD_fill(gfx, SpriteSize_16x16, 0);
-
-    if (vx == 0 && vy == 0) return;
-
-    s8 x = -1, y = -1, w = -1, h = -1;
-
-    x = vx < 0 ? 8 : 0;  // If pointing left then x = 8, else x = 0
-    y = vy < 0 ? 8 : 0;  // If pointing up then   y = 8, else y = 0
-
-    w = vx ? 8 : 16;  // If pointing left or right w = 8, else w = 16
-    h = vy ? 8 : 16;  // If pointing up or down    h = 8, else h = 16
-
-    // Adjust for diagonals
-    if (vx && vy)
-    {
-        x -= vx < 0 ? 4 : 0;
-        y -= vy < 0 ? 4 : 0;
-
-        w += 4;
-        h += 4;
-    }
-
-    SD_draw_square(gfx, SpriteSize_16x16, x, y, w, h, palette_index);
-}
-
 void oamSetGFXSizeColour(OamState *oam, int id, SpriteSize size, SpriteColorFormat format, const void *gfxOffset)
 {
     oamSet(oam,        // Oam
