@@ -9,7 +9,7 @@ void SK_SetupSkeleton(EN_Entity *skeleton, int x, int y)
     EN_Setup(skeleton, x, y, SK_WIDTH, SK_HEIGHT, ET_SKELETON, SK_MAX_HEALTH, SK_ATTACK_DELAY);
 }
 
-void SK_Update(EN_Entity *skeleton, EN_Entity players[], int players_len)
+void SK_Move(EN_Entity *skeleton, EN_Entity players[], int players_len)
 {
     /*
     When setting the initila min distance squared, I use the distance from two opposite corners of the map.

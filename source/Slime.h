@@ -40,7 +40,7 @@ void SL_SetupSlimeState(SL_SlimeState *slime_state);
 /*
 For slimes, the movement counts as an attack
 */
-void SL_Update(EN_Entity *slime, SL_SlimeState *slime_state, EN_Entity players[], int players_len);
+void SL_Move(EN_Entity *slime, SL_SlimeState *slime_state, EN_Entity players[], int players_len);
 
 /// Animates the slime by modifying its graphics
 void SL_Animate(EN_Entity *slime, u16 *slime_gfx, int frame_counter);

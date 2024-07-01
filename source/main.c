@@ -203,8 +203,8 @@ int main(void)
                 PL_Move(&players[i], 0);
         }
 
-        SK_Update(&enemies[SKELETON_INDEX], players, NUM_PLAYERS);
-        SL_Update(&enemies[SLIME_INDEX], &slime_state, players, NUM_PLAYERS);
+        SK_Move(&enemies[SKELETON_INDEX], players, NUM_PLAYERS);
+        SL_Move(&enemies[SLIME_INDEX], &slime_state, players, NUM_PLAYERS);
 
         for (int i = 0; i < NUM_PLAYERS; i++)
         {

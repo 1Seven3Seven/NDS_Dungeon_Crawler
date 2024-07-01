@@ -18,7 +18,7 @@ void SL_SetupSlimeState(SL_SlimeState *slime_state)
     slime_state->velocity = 0;  //
 }
 
-void SL_Update(EN_Entity *slime, SL_SlimeState *slime_state, EN_Entity players[], int players_len)
+void SL_Move(EN_Entity *slime, SL_SlimeState *slime_state, EN_Entity players[], int players_len)
 {
     // Wait till we can move
     if (slime->current_attack_delay > 0)
