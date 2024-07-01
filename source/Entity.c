@@ -4,6 +4,8 @@ void EN_Init(EN_Entity *entity)
 {
     entity->type = -1;
     entity->state = 0;
+
+    entity->gfx = NULL;
 }
 
 void EN_InitArray(EN_Entity entity_array[], int array_len)

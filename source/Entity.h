@@ -18,6 +18,11 @@ typedef struct _EN_Entity
     /// Size
     u8 w, h;
 
+    /// The graphics pointer for this entity.
+    /// `EN_Init` sets this to NULL, nothing else touches this.
+    /// Exists purely to prevent maintaining another graphics array alongside an entity array.
+    u16 *gfx;
+
     /// What type of entity this is.
     /// -1 means unset.
     s8 type;
