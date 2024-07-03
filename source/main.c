@@ -30,9 +30,10 @@
 #define NUM_BACKGROUNDS 1
 #define NUM_PLAYERS 2
 #define NUM_ENEMIES 2
+#define NUM_ENTITIES NUM_PLAYERS + NUM_ENEMIES
 
-#define SKELETON_INDEX 0
-#define SLIME_INDEX 1
+#define SKELETON_INDEX NUM_PLAYERS + 0
+#define SLIME_INDEX NUM_PLAYERS + 1
 
 void display_entity_position(int line_number, const char *prepend, EN_Entity *entity)
 {
@@ -77,55 +78,38 @@ int main(void)
     dmaCopy(BasicBackgroundMap, BG_MAP_RAM(0), BasicBackgroundMapLen);
     dmaCopy(BasicBackgroundPal, BG_PALETTE, BasicBackgroundPalLen);
 
-    // Setting up a player entity list
-    EN_Entity players[NUM_PLAYERS];
-    EN_InitArray(players, NUM_PLAYERS);
+    // All entities sit in the same array
+    // The first entities are the players, the rest are the enemies
+    EN_Entity all_entities[NUM_ENTITIES];
+    EN_InitArray(all_entities, NUM_ENTITIES);
 
     // Setting up the players
-    PL_SetupPlayer(&players[0], PLAYER_START_X, PLAYER_START_Y);
-    PL_SetupPlayer(&players[1], PLAYER_START_X + 50, PLAYER_START_Y + 50);
 
-    // Setting up an enemy entity list
-    EN_Entity enemies[NUM_ENEMIES];
-    EN_InitArray(players, NUM_ENEMIES);
+    PL_SetupPlayer(&all_entities[0], PLAYER_START_X, PLAYER_START_Y);
+    PL_SetupPlayer(&all_entities[1], PLAYER_START_X + 50, PLAYER_START_Y + 50);
 
     // Setting up the enemies
 
     // The skeleton
-    SK_SetupSkeleton(&enemies[SKELETON_INDEX], 10, 10);
+    SK_SetupSkeleton(&all_entities[SKELETON_INDEX], 10, 10);
 
     // The slime
-    SL_SetupSlime(&enemies[SLIME_INDEX], 250, 200);
+    SL_SetupSlime(&all_entities[SLIME_INDEX], 250, 200);
     SL_SlimeState slime_state;
     SL_SetupSlimeState(&slime_state);
 
     // Loading some graphics
     // No need to use dmaCopy as the animate functions do that each frame
-    for (int i = 0; i < NUM_PLAYERS; i++)
-        players[i].gfx = oamAllocateGfx(&oamMain, SpriteSize_16x16, SpriteColorFormat_256Color);
-
-    enemies[SKELETON_INDEX].gfx = oamAllocateGfx(&oamMain, SpriteSize_16x16, SpriteColorFormat_256Color);
-    enemies[SLIME_INDEX].gfx = oamAllocateGfx(&oamMain, SpriteSize_16x16, SpriteColorFormat_256Color);
+    for (int i = 0; i < NUM_ENTITIES; i++)
+        all_entities[i].gfx = oamAllocateGfx(&oamMain, SpriteSize_16x16, SpriteColorFormat_256Color);
 
     dmaCopy(SpriteSheetPal, SPRITE_PALETTE, SpriteSheetPalLen);
 
     // Setting oam entries
 
     // Initial x and y should not matter as we set the x and y each frame
-    for (int i = 0; i < NUM_PLAYERS; i++)
-    {
-        oamSetGFXSizeColour(&oamMain, i, SpriteSize_16x16, SpriteColorFormat_256Color, players[i].gfx);
-    }
-
-    // Skeleton gfx
-    oamSetGFXSizeColour(&oamMain, NUM_PLAYERS + SKELETON_INDEX,        //
-                        SpriteSize_16x16, SpriteColorFormat_256Color,  //
-                        enemies[SKELETON_INDEX].gfx);
-
-    // Slime gfx
-    oamSetGFXSizeColour(&oamMain, NUM_PLAYERS + SLIME_INDEX,           //
-                        SpriteSize_16x16, SpriteColorFormat_256Color,  //
-                        enemies[SLIME_INDEX].gfx);
+    for (int i = 0; i < NUM_ENTITIES; i++)
+        oamSetGFXSizeColour(&oamMain, i, SpriteSize_16x16, SpriteColorFormat_256Color, all_entities[i].gfx);
 
     int frame_counter = 0;
     int controlling_player_at_index = 0;
@@ -151,35 +135,35 @@ int main(void)
         for (int i = 0; i < NUM_PLAYERS; i++)
         {
             if (i == controlling_player_at_index)
-                PL_Move(&players[i], keys_held);
+                PL_Move(&all_entities[i], keys_held);
             else
-                PL_Move(&players[i], 0);
+                PL_Move(&all_entities[i], 0);
         }
 
-        SK_Move(&enemies[SKELETON_INDEX], players, NUM_PLAYERS);
-        SL_Move(&enemies[SLIME_INDEX], &slime_state, players, NUM_PLAYERS);
+        SK_Move(&all_entities[SKELETON_INDEX], all_entities, NUM_PLAYERS);
+        SL_Move(&all_entities[SLIME_INDEX], &slime_state, all_entities, NUM_PLAYERS);
 
         for (int i = 0; i < NUM_PLAYERS; i++)
         {
-            PL_Animate(&players[i], players[i].gfx, frame_counter);
+            PL_Animate(&all_entities[i], all_entities[i].gfx, frame_counter);
         }
-        SK_Animate(&enemies[SKELETON_INDEX], enemies[SKELETON_INDEX].gfx, frame_counter);
-        SL_Animate(&enemies[SLIME_INDEX], enemies[SLIME_INDEX].gfx, frame_counter);
+        SK_Animate(&all_entities[SKELETON_INDEX], all_entities[SKELETON_INDEX].gfx, frame_counter);
+        SL_Animate(&all_entities[SLIME_INDEX], all_entities[SLIME_INDEX].gfx, frame_counter);
 
-        CAM_CentreOnPlayer(players, NUM_PLAYERS, controlling_player_at_index,  //
-                           enemies, NUM_ENEMIES,                               //
+        CAM_CentreOnPlayer(all_entities, NUM_PLAYERS, controlling_player_at_index,  //
+                           all_entities + NUM_PLAYERS, NUM_ENEMIES,                 //
                            bg_ids, NUM_BACKGROUNDS);
 
         UI_PrintToLine(0, "frame_counter = %d", frame_counter);
-        display_entity_position(1, "Skeleton pos = ", &enemies[SKELETON_INDEX]);
-        display_entity_position(2, "Slime pos    = ", &enemies[SLIME_INDEX]);
+        display_entity_position(1, "Skeleton pos = ", &all_entities[SKELETON_INDEX]);
+        display_entity_position(2, "Slime pos    = ", &all_entities[SLIME_INDEX]);
 
         for (int i = 0; i < NUM_PLAYERS; i++)
         {
             char prepend[20];
             sprintf(prepend, "Player %d pos = ", i);
 
-            display_entity_position(4 + i, prepend, &players[i]);
+            display_entity_position(4 + i, prepend, &all_entities[i]);
         }
 
         frame_counter++;
