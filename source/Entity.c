@@ -98,6 +98,21 @@ float EN_Topf(EN_Entity *entity) { return entity->y; }
 float EN_Bottomf(EN_Entity *entity) { return entity->y + entity->h; }
 
 /*
+ * Collision check between entities.
+ */
+
+int EN_Collision(EN_Entity *entity1, EN_Entity *entity2)
+{
+    if (EN_Leftf(entity1) < EN_Rightf(entity2))
+        if (EN_Rightf(entity1) > EN_Leftf(entity2))
+            if (EN_Bottomf(entity1) > EN_Topf(entity2))
+                if (EN_Topf(entity1) < EN_Bottomf(entity2))  //
+                    return 1;
+
+    return 0;
+}
+
+/*
  * Setting sides of the collision rectangle.
  */
 
@@ -116,6 +131,74 @@ void EN_SetRightf(EN_Entity *entity, float right) { entity->x = right - entity->
 void EN_SetTopf(EN_Entity *entity, float top) { entity->y = top; }
 
 void EN_SetBottomf(EN_Entity *entity, float bottom) { entity->y = bottom - entity->h; }
+
+/*
+ * Moving an entity.
+ */
+
+int EN_MoveX(EN_Entity *entity, float x, EN_Entity other_entities[], int other_entities_len, int entity_index)
+{
+    int hit_a_hitbox = 0;
+
+    if (x == 0) return hit_a_hitbox;
+
+    entity->x += x;
+
+    for (int i = 0; i < other_entities_len; i++)
+    {
+        if (i == entity_index) continue;
+
+        EN_Entity *other_entity = &other_entities[i];
+
+        if (EN_Collision(entity, other_entity))
+        {
+            hit_a_hitbox = EN_COLLISION_X;
+
+            if (x > 0)
+                EN_SetRightf(entity, EN_Leftf(other_entity));
+            else
+                EN_SetLeftf(entity, EN_Rightf(other_entity));
+        }
+    }
+
+    return hit_a_hitbox;
+}
+
+int EN_MoveY(EN_Entity *entity, float y, EN_Entity other_entities[], int other_entities_len, int entity_index)
+{
+    int hit_a_hitbox = 0;
+
+    if (y == 0) return hit_a_hitbox;
+
+    entity->y += y;
+
+    for (int i = 0; i < other_entities_len; i++)
+    {
+        if (i == entity_index) continue;
+
+        EN_Entity *other_entity = &other_entities[i];
+
+        if (EN_Collision(entity, other_entity))
+        {
+            hit_a_hitbox = EN_COLLISION_Y;
+
+            if (y > 0)
+                EN_SetBottomf(entity, EN_Topf(other_entity));
+            else
+                EN_SetTopf(entity, EN_Bottomf(other_entity));
+        }
+    }
+
+    return hit_a_hitbox;
+}
+
+int EN_Move(EN_Entity *entity, float x, float y, EN_Entity other_entities[], int other_entities_len, int entity_index)
+{
+    int x_collision = EN_MoveX(entity, x, other_entities, other_entities_len, entity_index);
+    int y_collision = EN_MoveY(entity, y, other_entities, other_entities_len, entity_index);
+
+    return x_collision | y_collision;
+}
 
 /*
  * Other.

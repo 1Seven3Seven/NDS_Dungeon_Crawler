@@ -135,6 +135,14 @@ float EN_Topf(EN_Entity *entity);
 float EN_Bottomf(EN_Entity *entity);
 
 /*
+ * Collision check between entities.
+ */
+
+/// Checks for a collision between the two entities.
+/// Returns 1 if there is a collision, 0 if otherwise.
+int EN_Collision(EN_Entity *entity1, EN_Entity *entity2);
+
+/*
  * Setting sides of the collision rectangle.
  */
 
@@ -161,6 +169,31 @@ void EN_SetTopf(EN_Entity *entity, float top);
 
 /// Sets the y value of the bottom of the entity.
 void EN_SetBottomf(EN_Entity *entity, float bottom);
+
+/*
+ * Moving an entity.
+ */
+
+#define EN_COLLISION_X 1 << 0
+#define EN_COLLISION_Y 1 << 1
+
+/// Moves the entity by the given amount along the x-axis.
+/// Performs collision checks against entities in the given `other_entities`.
+/// Ignores the entity at `entity_index`, this should point to the entity being moved.
+/// Returns `EN_COLLISION_X` if there was a collision, 0 if otherwise.
+int EN_MoveX(EN_Entity *entity, float x, EN_Entity other_entities[], int other_entities_len, int entity_index);
+
+/// Moves the entity by the given amount along the y-axis.
+/// Performs collision checks against entities in the given `other_entities`.
+/// Ignores the entity at `entity_index`, this should point to the entity being moved.
+/// Returns `EN_COLLISION_Y` if there was a collision, 0 if otherwise.
+int EN_MoveY(EN_Entity *entity, float y, EN_Entity other_entities[], int other_entities_len, int entity_index);
+
+/// Moves the entity by the given amount.
+/// Performs collision checks against entities in the given `other_entities`.
+/// Ignores the entity at `entity_index`, this should point to the entity being moved.
+/// Returns the results of moving x and y bitwise or'd with each other.
+int EN_Move(EN_Entity *entity, float x, float y, EN_Entity other_entities[], int other_entities_len, int entity_index);
 
 /*
  * Other.
