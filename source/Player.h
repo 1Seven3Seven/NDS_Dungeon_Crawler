@@ -34,6 +34,6 @@ void PL_SetupPlayer(EN_Entity *player, int x, int y);
 void PL_Move(EN_Entity *player, uint32 keys_held);
 
 /// Animates the player by modifying its graphics.
-void PL_Animate(EN_Entity *player, u16 *player_gfx, int frame_counter);
+void PL_Animate(EN_Entity *player, int frame_counter);
 
 #endif

@@ -93,7 +93,7 @@ void SL_Move(EN_Entity *slime, SL_SlimeState *slime_state, EN_Entity players[], 
     slime_state->velocity--;
 }
 
-void SL_Animate(EN_Entity *slime, u16 *slime_gfx, int frame_counter)
+void SL_Animate(EN_Entity *slime, int frame_counter)
 {
     if (EN_GetStateBit(slime, SL_MOVING))
     {
@@ -105,6 +105,6 @@ void SL_Animate(EN_Entity *slime, u16 *slime_gfx, int frame_counter)
     }
 
     dmaCopy((u8 *)SpriteSheetTiles + ROW_OFFSET * 2 + SPRITE_SIZE * slime->animation_frame_number,  //
-            slime_gfx,                                                                              //
+            slime->gfx,                                                                             //
             SPRITE_SIZE);
 }

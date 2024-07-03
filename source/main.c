@@ -145,10 +145,10 @@ int main(void)
 
         for (int i = 0; i < NUM_PLAYERS; i++)
         {
-            PL_Animate(&all_entities[i], all_entities[i].gfx, frame_counter);
+            PL_Animate(&all_entities[i], frame_counter);
         }
-        SK_Animate(&all_entities[SKELETON_INDEX], all_entities[SKELETON_INDEX].gfx, frame_counter);
-        SL_Animate(&all_entities[SLIME_INDEX], all_entities[SLIME_INDEX].gfx, frame_counter);
+        SK_Animate(&all_entities[SKELETON_INDEX], frame_counter);
+        SL_Animate(&all_entities[SLIME_INDEX], frame_counter);
 
         CAM_CentreOnPlayer(all_entities, NUM_PLAYERS, controlling_player_at_index,  //
                            all_entities + NUM_PLAYERS, NUM_ENEMIES,                 //

@@ -56,7 +56,7 @@ void SK_Move(EN_Entity *skeleton, EN_Entity players[], int players_len)
     EN_SetStateBit(skeleton, SK_MOVING);
 }
 
-void SK_Animate(EN_Entity *skeleton, u16 *skeleton_gfx, int frame_counter)
+void SK_Animate(EN_Entity *skeleton, int frame_counter)
 {
     if (EN_GetStateBit(skeleton, SK_MOVING))
     {
@@ -68,6 +68,6 @@ void SK_Animate(EN_Entity *skeleton, u16 *skeleton_gfx, int frame_counter)
     }
 
     dmaCopy((u8 *)SpriteSheetTiles + ROW_OFFSET + SPRITE_SIZE * skeleton->animation_frame_number,  //
-            skeleton_gfx,                                                                          //
+            skeleton->gfx,                                                                         //
             SPRITE_SIZE);
 }

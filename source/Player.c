@@ -35,12 +35,12 @@ void PL_Move(EN_Entity *player, uint32 keys_held)
     if (player->y > MAP_HEIGHT - player->h) player->y = MAP_HEIGHT - player->h;
 }
 
-void PL_Animate(EN_Entity *player, u16 *player_gfx, int frame_counter)
+void PL_Animate(EN_Entity *player, int frame_counter)
 {
     if (EN_GetStateBit(player, PL_MOVING))
         player->animation_frame_number = 2 + (frame_counter / 10) % 2;
     else
         player->animation_frame_number = (frame_counter / 30) % 2;
 
-    dmaCopy((u8 *)SpriteSheetTiles + SPRITE_SIZE * player->animation_frame_number, player_gfx, SPRITE_SIZE);
+    dmaCopy((u8 *)SpriteSheetTiles + SPRITE_SIZE * player->animation_frame_number, player->gfx, SPRITE_SIZE);
 }
