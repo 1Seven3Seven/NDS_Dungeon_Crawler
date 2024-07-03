@@ -63,7 +63,11 @@ void SL_Move(EN_Entity *slime, SL_SlimeState *slime_state, EN_Entity players[], 
         // Jump at the closest player if we are close enough to them else a random direction
         float direction;
         if (min_distance_squared < SL_MAX_DISTANCE_ATTACK_PLAYER_SQUARED)
+        {
             direction = -atan2f(y_diff, x_diff);
+            // Add some randomness to the jump, 45 degrees of randomness, half to the left left and half to the right
+            direction += (((float)rand() / RAND_MAX - 0.5) * (M_PI / 180 * 45));
+        }
         else
             direction = ((float)rand() / RAND_MAX) * (M_PI * 2);
 
