@@ -40,7 +40,7 @@ void SK_Move(EN_Entity *skeleton, EN_Entity players[], int players_len)
     // Stop moving if close enough
     if (min_distance_squared < SK_MIN_DISTANCE_TO_ATTACK_PLAYER_SQUARED)
     {
-        EN_ClearStateBit(skeleton, EN_STATE_MOVING);
+        EN_ClearStateBit(skeleton, SK_MOVING);
         return;
     }
 
@@ -53,12 +53,12 @@ void SK_Move(EN_Entity *skeleton, EN_Entity players[], int players_len)
     skeleton->x += x_move;
     skeleton->y += y_move;
 
-    EN_SetStateBit(skeleton, EN_STATE_MOVING);
+    EN_SetStateBit(skeleton, SK_MOVING);
 }
 
 void SK_Animate(EN_Entity *skeleton, u16 *skeleton_gfx, int frame_counter)
 {
-    if (EN_GetStateBit(skeleton, EN_STATE_MOVING))
+    if (EN_GetStateBit(skeleton, SK_MOVING))
     {
         skeleton->animation_frame_number = 2 + (frame_counter / 10) % 2;
     }

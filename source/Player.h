@@ -22,6 +22,11 @@
 #define PL_MAX_HEALTH 1
 #define PL_ATTACK_DELAY 32
 
+typedef enum _PL_State
+{
+    PL_MOVING = 1,
+} PL_State;
+
 /// Set up the given entity as a player.
 void PL_SetupPlayer(EN_Entity *player, int x, int y);
 

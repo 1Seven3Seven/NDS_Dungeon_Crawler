@@ -2,20 +2,21 @@
 #define DUNGEON_CRAWLER_ENTITY_H
 
 /**
+ * A single place to include to get all entity code.
+ *
  * PREFIX: EN
  */
 
 #include <nds.h>
 
 #define EN_STATE_ALIVE 0
-#define EN_STATE_MOVING 1
 
 typedef struct _EN_Entity
 {
-    /// Position
+    /// Position.
     float x, y;
 
-    /// Size
+    /// Size.
     u8 w, h;
 
     /// The graphics pointer for this entity.
@@ -27,25 +28,30 @@ typedef struct _EN_Entity
     /// -1 means unset.
     s8 type;
 
-    /// Health
+    /// Health.
     u16 health;
-    /// The maximum health
+    /// The maximum health.
     u16 max_health;
 
-    /// The delay between attacks
+    /// The delay between attacks.
     u8 attack_delay;
-    /// The amount of time to wait till the next attack
+    /// The amount of time to wait till the next attack.
     u8 current_attack_delay;
 
-    /// The current frame of animation to be displayed
+    /// The current frame of animation to be displayed.
     u8 animation_frame_number;
 
-    /// The current state of the entity
-    /// 0 means dead
-    /// Lowest bit set means alive
+    /// The current state of the entity.
+    /// 0 means dead.
+    /// The lowest bit is reserved to mean alive.
+    /// Every other bit can be used however.
     u8 state;
 
 } EN_Entity;
+
+/*
+ * Initialising and setting up an entity.
+ */
 
 /// Sets up the entity to a default, dead, state.
 void EN_Init(EN_Entity *entity);
@@ -71,18 +77,22 @@ int EN_SetupInSrray(EN_Entity entity_array[], int array_len,  //
                     u16 max_health,                           //
                     u8 attack_delay);
 
-/// Applies the given damage to the entity.
-/// If the entity will die, the state is set to 0.
-void EN_TakeDamage(EN_Entity *entity, int damage);
+/*
+ * Managing entity state.
+ */
 
-/// Set the `bit`th bit of the state
-void EN_SetStateBit(EN_Entity *entity, int bit);
+/// Set the `n`th bit of the state.
+void EN_SetStateBit(EN_Entity *entity, int n);
 
-/// Clears the `bit`th bit of the state
-void EN_ClearStateBit(EN_Entity *entity, int bit);
+/// Clears the `n`th bit of the state.
+void EN_ClearStateBit(EN_Entity *entity, int n);
 
-/// Gets the `bit`th bit of the state
-int EN_GetStateBit(EN_Entity *entity, int bit);
+/// Gets the `n`th bit of the state.
+int EN_GetStateBit(EN_Entity *entity, int n);
+
+/*
+ * Finding the centre of an entity.
+ */
 
 /// Calculates and returns the x position of the center of the entity.
 int EN_CentreX(EN_Entity *entity);
@@ -95,6 +105,10 @@ float EN_CentreXf(EN_Entity *entity);
 
 /// Calculates and returns the y position of the center of the entity.
 float EN_CentreYf(EN_Entity *entity);
+
+/*
+ * Getting sides of the collision rectangle.
+ */
 
 /// Returns the x value of the left of the entity.
 int EN_Left(EN_Entity *entity);
@@ -119,5 +133,41 @@ float EN_Topf(EN_Entity *entity);
 
 /// Returns the y value of the bottom of the entity.
 float EN_Bottomf(EN_Entity *entity);
+
+/*
+ * Setting sides of the collision rectangle.
+ */
+
+/// Sets the x value of the left of the entity.
+void EN_SetLeft(EN_Entity *entity, int left);
+
+/// Sets the x value of the right of the entity.
+void EN_SetRight(EN_Entity *entity, int right);
+
+/// Sets the y value of the top of the entity.
+void EN_SetTop(EN_Entity *entity, int top);
+
+/// Sets the y value of the bottom of the entity.
+void EN_SetBottom(EN_Entity *entity, int bottom);
+
+/// Sets the x value of the left of the entity.
+void EN_SetLeftf(EN_Entity *entity, float left);
+
+/// Sets the x value of the right of the entity.
+void EN_SetRightf(EN_Entity *entity, float right);
+
+/// Sets the y value of the top of the entity.
+void EN_SetTopf(EN_Entity *entity, float top);
+
+/// Sets the y value of the bottom of the entity.
+void EN_SetBottomf(EN_Entity *entity, float bottom);
+
+/*
+ * Other.
+ */
+
+/// Applies the given damage to the entity.
+/// If the entity will die, the state is set to 0.
+void EN_TakeDamage(EN_Entity *entity, int damage);
 
 #endif

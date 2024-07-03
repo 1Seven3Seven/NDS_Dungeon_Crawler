@@ -1,5 +1,9 @@
 #include "Entity.h"
 
+/*
+ * Initialising and setting up an entity.
+ */
+
 void EN_Init(EN_Entity *entity)
 {
     entity->type = -1;
@@ -51,20 +55,19 @@ int EN_SetupInSrray(EN_Entity entity_array[], int array_len, int x, int y, u8 w,
     return -1;
 }
 
-void EN_TakeDamage(EN_Entity *entity, int damage)
-{
-    entity->health -= damage;
-    if (entity->health <= 0)
-    {
-        entity->state = 0;
-    }
-}
+/*
+ * Managing entity state.
+ */
 
-void EN_SetStateBit(EN_Entity *entity, int bit) { entity->state |= 1 << bit; }
+void EN_SetStateBit(EN_Entity *entity, int n) { entity->state |= 1 << n; }
 
-void EN_ClearStateBit(EN_Entity *entity, int bit) { entity->state &= ~(1 << bit); }
+void EN_ClearStateBit(EN_Entity *entity, int n) { entity->state &= ~(1 << n); }
 
-int EN_GetStateBit(EN_Entity *entity, int bit) { return entity->state & (1 << bit); }
+int EN_GetStateBit(EN_Entity *entity, int n) { return entity->state & (1 << n); }
+
+/*
+ * Finding the centre of an entity.
+ */
 
 int EN_CentreX(EN_Entity *entity) { return entity->x + entity->w / 2; }
 
@@ -73,6 +76,10 @@ int EN_CentreY(EN_Entity *entity) { return entity->y + entity->h / 2; }
 float EN_CentreXf(EN_Entity *entity) { return entity->x + (float)entity->w / 2; }
 
 float EN_CentreYf(EN_Entity *entity) { return entity->y + (float)entity->h / 2; }
+
+/*
+ * Getting sides of the collision rectangle.
+ */
 
 int EN_Left(EN_Entity *entity) { return entity->x; }
 
@@ -89,3 +96,36 @@ float EN_Rightf(EN_Entity *entity) { return entity->x + entity->w; }
 float EN_Topf(EN_Entity *entity) { return entity->y; }
 
 float EN_Bottomf(EN_Entity *entity) { return entity->y + entity->h; }
+
+/*
+ * Setting sides of the collision rectangle.
+ */
+
+void EN_SetLeft(EN_Entity *entity, int left) { entity->x = left; }
+
+void EN_SetRight(EN_Entity *entity, int right) { entity->x = right - entity->w; }
+
+void EN_SetTop(EN_Entity *entity, int top) { entity->y = top; }
+
+void EN_SetBottom(EN_Entity *entity, int bottom) { entity->y = bottom - entity->h; }
+
+void EN_SetLeftf(EN_Entity *entity, float left) { entity->x = left; }
+
+void EN_SetRightf(EN_Entity *entity, float right) { entity->x = right - entity->w; }
+
+void EN_SetTopf(EN_Entity *entity, float top) { entity->y = top; }
+
+void EN_SetBottomf(EN_Entity *entity, float bottom) { entity->y = bottom - entity->h; }
+
+/*
+ * Other.
+ */
+
+void EN_TakeDamage(EN_Entity *entity, int damage)
+{
+    entity->health -= damage;
+    if (entity->health <= 0)
+    {
+        entity->state = 0;
+    }
+}

@@ -15,6 +15,11 @@
 
 #define SK_MIN_DISTANCE_TO_ATTACK_PLAYER_SQUARED 32 * 32
 
+typedef enum _SK_State
+{
+    SK_MOVING = 1,
+} SK_State;
+
 ///
 void SK_SetupSkeleton(EN_Entity *skeleton, int x, int y);
 

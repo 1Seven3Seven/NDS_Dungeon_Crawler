@@ -66,13 +66,13 @@ void SL_Move(EN_Entity *slime, SL_SlimeState *slime_state, EN_Entity players[], 
         slime_state->vy = -sinf(direction);
 
         // We are moving
-        EN_SetStateBit(slime, EN_STATE_MOVING);
+        EN_SetStateBit(slime, SL_MOVING);
     }
 
     if (slime_state->velocity == 0)
     {
         // We have finished moving
-        EN_ClearStateBit(slime, EN_STATE_MOVING);
+        EN_ClearStateBit(slime, SL_MOVING);
 
         // Start the cooldown
         slime->current_attack_delay = slime->attack_delay;
@@ -95,7 +95,7 @@ void SL_Move(EN_Entity *slime, SL_SlimeState *slime_state, EN_Entity players[], 
 
 void SL_Animate(EN_Entity *slime, u16 *slime_gfx, int frame_counter)
 {
-    if (EN_GetStateBit(slime, EN_STATE_MOVING))
+    if (EN_GetStateBit(slime, SL_MOVING))
     {
         slime->animation_frame_number = 2 + (frame_counter / 7) % 2;
     }

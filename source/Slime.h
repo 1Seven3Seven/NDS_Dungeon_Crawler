@@ -20,6 +20,11 @@
 
 #define SL_MAX_DISTANCE_ATTACK_PLAYER_SQUARED 72 * 72
 
+typedef enum _SL_State
+{
+    SL_MOVING = 1,
+} SL_State;
+
 typedef struct _SL_SlimeState
 {
     /// The direction the slime is moving as a unit vector.
