@@ -18,6 +18,14 @@ void SL_SetupSlimeState(SL_SlimeState *slime_state)
     slime_state->velocity = 0;  //
 }
 
+void SL_SetupSlimeStateArray(SL_SlimeState slime_states[], int slime_states_len)
+{
+    for (int i = 0; i < slime_states_len; i++)
+    {
+        SL_SetupSlimeState(&slime_states[i]);
+    }
+}
+
 void SL_Move(EN_Entity *slime, SL_SlimeState *slime_state, EN_Entity players[], int players_len)
 {
     // Wait till we can move

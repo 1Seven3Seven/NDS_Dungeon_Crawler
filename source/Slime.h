@@ -42,6 +42,9 @@ void SL_SetupSlime(EN_Entity *entity, int x, int y);
 ///
 void SL_SetupSlimeState(SL_SlimeState *slime_state);
 
+///
+void SL_SetupSlimeStateArray(SL_SlimeState slime_states[], int slime_states_len);
+
 /*
 For slimes, the movement counts as an attack
 */
